@@ -19,6 +19,16 @@ return new class extends Migration
             $table->string('supplier_name');
             $table->date('order_date');
             $table->date('expected_delivery_date')->nullable();
+            $table->date('delivered_at')->nullable();
+            
+            $table->foreignId('delivery_address_id')
+                ->nullable()
+                ->constrained('addresses')
+                ->nullOnDelete();
+            $table->foreignId('assigned_rider_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
 
             $table->enum('status', ['pending', 'received', 'cancelled'])->default('pending');
 

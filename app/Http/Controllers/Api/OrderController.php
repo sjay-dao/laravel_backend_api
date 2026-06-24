@@ -35,6 +35,7 @@ class OrderController extends Controller
             'payment_type' => 'nullable|in:cash,scheduled,external_installment',
             'payment_status' => 'nullable|in:unpaid,pending,partial,paid,overdue,cancelled',
             'payment_due_date' => 'nullable|date',
+            'delivery_address_id' => 'nullable',
             'external_payment_reference' => 'nullable|string|max:255',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
@@ -50,6 +51,7 @@ class OrderController extends Controller
                 'order_number' => $validated['order_number'],
                 'supplier_name' => $validated['supplier_name'],
                 'order_date' => $validated['order_date'],
+                'delivery_address_id' => $validated['delivery_address_id'],
                 'expected_delivery_date' => $validated['expected_delivery_date'] ?? null,
                 'status' => $validated['status'] ?? 'pending',
                 'total_amount' => 0,
@@ -159,6 +161,19 @@ class OrderController extends Controller
         return response()->json([
             'message' => 'Order cancelled successfully.',
             'order' => $order,
+        ]);
+    }
+
+    public function map()
+    {
+        $orders = Order::with([
+            'deliveryAddress',
+            'latestLocationLog',
+            'locationLogs'
+        ])->get();
+
+        return response()->json([
+            'orders' => $orders
         ]);
     }
 }
