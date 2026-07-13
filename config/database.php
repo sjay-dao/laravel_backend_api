@@ -98,6 +98,20 @@ return [
             'engine' => null,
         ],
 
+         'rms_database' => [
+            'driver' => 'mysql',
+            'host' => env('RMS_DB_HOST', ''),
+            'port' => env('RMS_DB_PORT', ''),
+            'database' => env('RMS_DB_DATABASE', ''),
+            'username' => env('RMS_DB_USERNAME', ''),
+            'password' => env('RMS_DB_PASSWORD', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+            'engine' => null,
+        ],
+
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),

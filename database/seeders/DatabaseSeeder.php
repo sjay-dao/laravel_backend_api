@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
             LocationLogSeeder::class,
             AddressesSeeder::class,
             RolesSeeder::class,
+            BranchSeeder::class,
+            UnitSeeder::class,
         ]);
     }
 }

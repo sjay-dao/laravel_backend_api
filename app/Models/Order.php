@@ -22,6 +22,7 @@ class Order extends Model
     'remarks',
     'cancellation_reason',
     'cancelled_at',
+    'branch_id'
 ];
 
     public function items()
@@ -48,5 +49,9 @@ class Order extends Model
     public function locationLogs()
     {
         return $this->hasMany(LocationLog::class);
+    }
+
+    public function branch(){
+        return $this->belongsTo(Branch::class);
     }
 }
