@@ -39,4 +39,16 @@ class InventoryObjectUnitRepository extends BaseRepository
             ->with('unit')
             ->get();
     }
+
+    public function findByInventoryObjectAndUnit(
+        int $inventoryObjectId,
+        int $unitId
+    )
+    {
+        return $this->model
+            ->newQuery()
+            ->where('inventory_object_id', $inventoryObjectId)
+            ->where('unit_id', $unitId)
+            ->first();
+    }
 }

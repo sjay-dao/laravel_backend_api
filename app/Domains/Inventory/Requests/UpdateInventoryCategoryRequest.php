@@ -16,7 +16,7 @@ class UpdateInventoryCategoryRequest extends FormRequest
     {
         return [
             Rule::unique('inventory_categories', 'code')
-    ->ignore($this->route('inventory_category'))
+                ->ignore($this->route('inventory_category'))
         ];
     }
 }

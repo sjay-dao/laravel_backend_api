@@ -5,7 +5,8 @@ use App\Domains\Inventory\Controllers\InventoryObjectUnitController;
 use App\Domains\Inventory\Controllers\InventoryObjectController;
 use App\Domains\Inventory\Controllers\InventoryCategoryController;
 use App\Domains\Inventory\Controllers\UnitController;
-
+use App\Domains\Inventory\Controllers\WarehouseController;
+use App\Domains\Inventory\Controllers\InventoryMovementController;
 
 Route::prefix('inventory')->group(function () {
 
@@ -27,6 +28,16 @@ Route::prefix('inventory')->group(function () {
     Route::apiResource(
         'inventory-objects',
         InventoryObjectController::class
+    );
+
+    Route::apiResource(
+        'warehouse',
+        WarehouseController::class
+    );
+
+    Route::apiResource(
+        'movements',
+        InventoryMovementController::class
     );
 
 });
