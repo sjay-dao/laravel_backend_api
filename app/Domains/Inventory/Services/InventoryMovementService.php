@@ -149,4 +149,15 @@ class InventoryMovementService
         return $movement;
     }
     
+   public function getCurrentStock(
+        int $inventoryObjectId,
+        ?int $warehouseId = null
+    ): float {
+
+        return $this->movementRepository
+            ->getCurrentStock(
+                $inventoryObjectId,
+                $warehouseId
+            );
+    }
 }

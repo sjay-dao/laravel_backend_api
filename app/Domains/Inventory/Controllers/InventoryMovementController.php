@@ -99,4 +99,26 @@ class InventoryMovementController extends BaseApiController
             405
         );
     }
+
+    public function stock(
+        int $inventoryObjectId
+    )
+    {
+        return ApiResponse::success(
+
+            [
+
+                'inventory_object_id' => $inventoryObjectId,
+
+                'stock' => $this->service
+                    ->getCurrentStock(
+                        $inventoryObjectId
+                    )
+
+            ],
+
+            'Current stock retrieved.'
+
+        );
+    }
 }

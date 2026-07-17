@@ -10,6 +10,14 @@ use App\Domains\Inventory\Controllers\InventoryMovementController;
 
 Route::prefix('inventory')->group(function () {
 
+    Route::get(
+        'movements/stocks/{inventoryObject}',
+        [
+            InventoryMovementController::class,
+            'stock'
+        ]
+    );
+
     Route::apiResource(
         'units',
         UnitController::class
