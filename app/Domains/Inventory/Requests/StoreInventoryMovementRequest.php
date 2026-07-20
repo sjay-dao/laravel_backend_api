@@ -68,15 +68,10 @@ class StoreInventoryMovementRequest extends FormRequest
                 'array',
                 'min:1',
             ],
-
-            'items.*.inventory_object_id' => [
+            
+            'items.*.inventory_object_unit_id' => [
                 'required',
-                'exists:inventory_objects,id',
-            ],
-
-            'items.*.unit_id' => [
-                'required',
-                'exists:units,id',
+                'exists:inventory_object_units,id'
             ],
 
             'items.*.quantity' => [

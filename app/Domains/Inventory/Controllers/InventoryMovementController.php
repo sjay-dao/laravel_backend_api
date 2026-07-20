@@ -42,8 +42,8 @@ class InventoryMovementController extends BaseApiController
                     'movementType',
                     'warehouse',
                     'branch',
-                    'items.inventoryObject',
-                    'items.unit',
+                    'items.inventoryObjectUnit.InventoryObject',
+                    'items.inventoryObjectUnit.unit',
                 ])
             ),
             'Inventory Movement created successfully.'
@@ -111,7 +111,7 @@ class InventoryMovementController extends BaseApiController
                 'inventory_object_id' => $inventoryObjectId,
 
                 'stock' => $this->service
-                    ->getCurrentStock(
+                    ->getStock(
                         $inventoryObjectId
                     )
 
@@ -121,4 +121,20 @@ class InventoryMovementController extends BaseApiController
 
         );
     }
+
+    public function ledger(
+        int $inventoryObjectId
+    )
+    {
+        return ApiResponse::success(
+
+            $this->service->ledger(
+                $inventoryObjectId
+            ),
+
+            'Inventory ledger retrieved successfully.'
+
+        );
+    }
+    
 }

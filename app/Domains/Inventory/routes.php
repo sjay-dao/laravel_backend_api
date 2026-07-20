@@ -7,6 +7,8 @@ use App\Domains\Inventory\Controllers\InventoryCategoryController;
 use App\Domains\Inventory\Controllers\UnitController;
 use App\Domains\Inventory\Controllers\WarehouseController;
 use App\Domains\Inventory\Controllers\InventoryMovementController;
+use App\Domains\Inventory\Controllers\InventoryReservationController;
+use App\Domains\Inventory\Controllers\InventoryStockController;
 
 Route::prefix('inventory')->group(function () {
 
@@ -15,6 +17,14 @@ Route::prefix('inventory')->group(function () {
         [
             InventoryMovementController::class,
             'stock'
+        ]
+    );
+
+    Route::get(
+        'movements/stocks/{inventoryObject}/ledger',
+        [
+            InventoryMovementController::class,
+            'ledger'
         ]
     );
 
@@ -47,5 +57,10 @@ Route::prefix('inventory')->group(function () {
         'movements',
         InventoryMovementController::class
     );
+
+    // Route::apiResource(
+    //     'reservations',
+    //     InventoryReservationController::class
+    // );
 
 });

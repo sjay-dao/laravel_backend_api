@@ -12,18 +12,41 @@ class InventoryMovementItemResource extends JsonResource
         return [
 
             'id' => $this->id,
+            'inventory_object_unit' => [
 
-            'inventory_object' => [
-                'id' => $this->inventoryObject?->id,
-                'name' => $this->inventoryObject?->name,
+                'id' => $this->inventoryObjectUnit?->id,
+
+                'conversion_factor' =>
+                    $this->inventoryObjectUnit?->conversion_factor,
+
+                'inventory_object' => [
+
+                    'id' =>
+                        $this->inventoryObjectUnit?->inventoryObject?->id,
+
+                    'code' =>
+                        $this->inventoryObjectUnit?->inventoryObject?->code,
+
+                    'name' =>
+                        $this->inventoryObjectUnit?->inventoryObject?->name,
+
+                ],
+
+                'unit' => [
+
+                    'id' =>
+                        $this->inventoryObjectUnit?->unit?->id,
+
+                    'code' =>
+                        $this->inventoryObjectUnit?->unit?->code,
+
+                    'symbol' =>
+                        $this->inventoryObjectUnit?->unit?->symbol,
+
+                ],
+
             ],
-
-            'unit' => [
-                'id' => $this->unit?->id,
-                'name' => $this->unit?->name,
-                'symbol' => $this->unit?->symbol,
-            ],
-
+            
             'quantity' => $this->quantity,
 
             'unit_conversion_factor' => $this->unit_conversion_factor,

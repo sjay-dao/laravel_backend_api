@@ -51,4 +51,14 @@ class InventoryObjectUnitRepository extends BaseRepository
             ->where('unit_id', $unitId)
             ->first();
     }
+
+    public function getActiveById(
+        int $id
+    )
+    {
+        return $this->model
+            ->where('id', $id)
+            ->where('is_active', true)
+            ->first();
+    }
 }

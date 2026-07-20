@@ -5,9 +5,8 @@ namespace App\Domains\Inventory\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Domains\Inventory\Models\InventoryMovement;
-use App\Domains\Inventory\Models\InventoryObject;
-use App\Domains\Inventory\Models\Unit;
-
+use App\Domains\Inventory\Models\InventoryObjectUnit;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InventoryMovementItem extends Model
 {
@@ -15,18 +14,13 @@ class InventoryMovementItem extends Model
 
     protected $fillable = [
         'inventory_movement_id',
-        'inventory_object_id',
-        'unit_id',
+        'inventory_object_unit_id',
         'quantity',
-        'unit_conversion_factor',
-        'base_quantity',
         'remarks',
     ];
 
     protected $casts = [
         'quantity' => 'decimal:6',
-        'unit_conversion_factor' => 'decimal:6',
-        'base_quantity' => 'decimal:6',
     ];
 
     /*
@@ -43,19 +37,11 @@ class InventoryMovementItem extends Model
         );
     }
 
-    public function inventoryObject()
+    public function inventoryObjectUnit(): BelongsTo
     {
         return $this->belongsTo(
-            InventoryObject::class,
-            'inventory_object_id'
-        );
-    }
-
-    public function unit()
-    {
-        return $this->belongsTo(
-            Unit::class,
-            'unit_id'
+            InventoryObjectUnit::class,
+            'inventory_object_unit_id'
         );
     }
 }
