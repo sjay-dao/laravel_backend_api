@@ -4,7 +4,12 @@ use App\Domains\Employee\Controllers\EmployeeController;
 use App\Domains\Employee\Controllers\EmployeeReferenceController;
 use App\Domains\Employee\Controllers\EmployeeReportController;
 use App\Domains\Employee\Controllers\EmployeeTransactionController;
+use App\Domains\Employee\Controllers\AttendanceController;
+use App\Domains\Employee\Controllers\SalaryContractController;
+use App\Domains\Employee\Controllers\ScheduleController;
+use App\Domains\Employee\Controllers\EmployeeScheduleAssignmentController;
 use Illuminate\Support\Facades\Route;
+
 
 Route::middleware('auth:sanctum')->prefix('employees')->group(function () {
     Route::get('references/departments', [EmployeeReferenceController::class, 'departments']);
@@ -33,3 +38,67 @@ Route::middleware('auth:sanctum')->prefix('employee-transactions')->group(functi
     Route::get('{employeeTransaction}', [EmployeeTransactionController::class, 'show']);
     Route::post('{employeeTransaction}/void', [EmployeeTransactionController::class, 'void']);
 });
+
+Route::middleware('auth:sanctum')
+    ->prefix('attendance')
+    ->controller(AttendanceController::class)
+    ->group(function () {
+
+        Route::get('/calendar', 'calendar');
+        Route::get('/{attendance}', 'show');
+        Route::post('/', 'store');
+        Route::patch('/{attendance}', 'update');
+        Route::delete('/{attendance}', 'destroy');
+        Route::get('/', 'index');          // <-- ADD THIS
+    });
+
+Route::middleware('auth:sanctum')
+    ->prefix('salary-contract')
+    ->controller(SalaryContractController::class)
+    ->group(function () {
+
+        Route::get('/', 'index');
+
+        Route::get('/{salaryContract}', 'show');
+
+        Route::post('/', 'store');
+
+        Route::patch('/{salaryContract}', 'update');
+
+        Route::delete('/{salaryContract}', 'destroy');
+
+    });
+
+Route::middleware('auth:sanctum')
+    ->prefix('schedule')
+    ->controller(ScheduleController::class)
+    ->group(function () {
+
+        Route::get('/', 'index');
+
+        Route::get('/{schedule}', 'show');
+
+        Route::post('/', 'store');
+
+        Route::patch('/{schedule}', 'update');
+
+        Route::delete('/{schedule}', 'destroy');
+
+    });
+
+Route::middleware('auth:sanctum')
+    ->prefix('employee-schedule-assignments')
+    ->controller(EmployeeScheduleAssignmentController::class)
+    ->group(function () {
+
+        Route::get('/', 'index');
+
+        Route::get('/{assignment}', 'show');
+
+        Route::post('/', 'store');
+
+        Route::patch('/{assignment}', 'update');
+
+        Route::delete('/{assignment}', 'destroy');
+
+    });

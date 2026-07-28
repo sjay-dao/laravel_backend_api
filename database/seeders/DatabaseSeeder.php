@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             BranchSeeder::class,
             UnitSeeder::class,
             EmployeePermissionSeeder::class,
+            LookupTypeSeeder::class,
+            LookupSeeder::class,
         ]);
     }
 }

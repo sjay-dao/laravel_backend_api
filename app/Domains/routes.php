@@ -7,6 +7,7 @@ $domains = [
     'Sales',
     'System',
     'Employee',
+    'Attendance',
 ];
 
 foreach ($domains as $domain) {

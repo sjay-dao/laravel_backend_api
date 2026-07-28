@@ -55,5 +55,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/location-logs', LocationLogController::class);
     Route::apiResource('branches', BranchController::class);
     Route::apiResource('addresses', AddressController::class);
-
 });

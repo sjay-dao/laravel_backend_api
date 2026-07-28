@@ -6,7 +6,8 @@ use App\Models\Branch;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use App\Domains\Employee\Models\SalaryContract;
+use App\Domains\Employee\Models\EmployeeScheduleAssignment;
 class Employee extends Model
 {
     use SoftDeletes;
@@ -26,4 +27,12 @@ class Employee extends Model
     public function activities() { return $this->hasMany(ActivityLog::class); }
     public function createdBy() { return $this->belongsTo(User::class, 'created_by'); }
     public function updatedBy() { return $this->belongsTo(User::class, 'updated_by'); }
+    public function salaryContracts()
+    {
+        return $this->hasMany(SalaryContract::class);
+    }
+    public function scheduleAssignments()
+    {
+        return $this->hasMany(EmployeeScheduleAssignment::class);
+    }
 }
