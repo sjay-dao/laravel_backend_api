@@ -4,7 +4,7 @@ namespace App\Domains\Reference\Services;
 
 use Closure;
 use Illuminate\Support\Facades\Cache;
-
+use Illuminate\Support\Collection;
 class ReferenceCache
 {
     protected function key(string $type): string
@@ -22,9 +22,7 @@ class ReferenceCache
         return Cache::remember(
             $this->key($type),
             now()->addDay(),
-            function () use ($callback) {
-                return $callback()->toArray();
-            }
+            fn() => collect($callback())->toArray()
         );
     }
 

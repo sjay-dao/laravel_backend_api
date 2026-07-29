@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Domains\Employee\Models\SalaryContract;
 use App\Domains\Employee\Models\EmployeeScheduleAssignment;
+
+use App\Domains\Reference\Models\Reference;
 class Employee extends Model
 {
     use SoftDeletes;
@@ -34,5 +36,13 @@ class Employee extends Model
     public function scheduleAssignments()
     {
         return $this->hasMany(EmployeeScheduleAssignment::class);
+    }
+
+    public function employmentStatus()
+    {
+        return $this->belongsTo(
+            Reference::class,
+            'employment_status_id'
+        );
     }
 }
