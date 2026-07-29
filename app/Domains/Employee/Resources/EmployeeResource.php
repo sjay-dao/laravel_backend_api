@@ -2,6 +2,7 @@
 
 namespace App\Domains\Employee\Resources;
 
+use App\Domains\Reference\Resources\ReferenceResource as ResourcesReferenceResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Domains\Reference\Resources\ReferenceResource;

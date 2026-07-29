@@ -12,6 +12,7 @@ use App\Domains\Employee\Services\AttendanceService;
 
 use App\Domains\Employee\Resources\AttendanceResource;
 use App\Domains\Employee\Resources\AttendanceCalendarResource;
+use App\Domains\Employee\Requests\BulkAttendanceRequest;
 
 class AttendanceController extends Controller
 {
@@ -88,5 +89,17 @@ class AttendanceController extends Controller
         return AttendanceResource::collection(
             $this->service->index($request->all())
         );
+    }
+
+    public function bulk(
+        BulkAttendanceRequest $request
+    ) {
+        $this->service->bulkSave(
+            $request->validated()
+        );
+
+        return response()->json([
+            'success' => true,
+        ]);
     }
 }

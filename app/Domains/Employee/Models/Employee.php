@@ -14,7 +14,7 @@ class Employee extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['employee_no', 'first_name', 'middle_name', 'last_name', 'suffix', 'birth_date', 'gender', 'email', 'mobile_number', 'phone_number', 'address', 'branch_id', 'department_id', 'position_id', 'employment_status', 'hire_date', 'regularization_date', 'separation_date', 'tin', 'sss_number', 'philhealth_number', 'pagibig_number', 'bank_name', 'bank_account_name', 'bank_account_number', 'notes', 'created_by', 'updated_by'];
+    protected $fillable = ['employee_no', 'first_name', 'middle_name', 'last_name', 'suffix', 'birth_date', 'gender', 'email', 'mobile_number', 'phone_number', 'address', 'branch_id', 'department_id', 'position_id', 'employment_status_id', 'hire_date', 'regularization_date', 'separation_date', 'tin', 'sss_number', 'philhealth_number', 'pagibig_number', 'bank_name', 'bank_account_name', 'bank_account_number', 'notes', 'created_by', 'updated_by'];
     protected $casts = ['birth_date' => 'date', 'hire_date' => 'date', 'regularization_date' => 'date', 'separation_date' => 'date'];
     protected $appends = ['full_name'];
 

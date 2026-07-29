@@ -59,4 +59,17 @@ class AttendanceService
             $month
         );
     }
+
+    public function bulkSave(array $data): void
+    {
+        foreach ($data['dates'] as $date) {
+
+            $this->repository->upsert(
+                $data['employee_id'],
+                $date,
+                $data['status'],
+                'Manual Entry'
+            );
+        }
+    }
 }

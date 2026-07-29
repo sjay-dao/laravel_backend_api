@@ -3,7 +3,7 @@
 namespace App\Domains\Employee\Repositories;
 
 use App\Domains\Employee\Models\AttendanceRecord;
-
+use Illuminate\Support\Facades\DB;
 class AttendanceRepository
 {
 
@@ -72,4 +72,25 @@ class AttendanceRepository
             ->groupBy('status')
             ->pluck('total', 'status');
     }
+
+
+    public function upsert(
+        int $employeeId,
+        string $date,
+        string $status,
+        ?string $remarks = null
+    ): AttendanceRecord {
+
+        return AttendanceRecord::updateOrCreate(
+            [
+                'employee_id' => $employeeId,
+                'attendance_date' => $date,
+            ],
+            [
+                'status' => $status,
+                'remarks' => $remarks,
+            ]
+        );
+    }
+    
 }

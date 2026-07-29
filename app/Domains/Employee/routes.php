@@ -46,6 +46,7 @@ Route::middleware('auth:sanctum')
 
         Route::get('/calendar', 'calendar');
         Route::get('/{attendance}', 'show');
+        Route::post('/bulk','bulk');
         Route::post('/', 'store');
         Route::patch('/{attendance}', 'update');
         Route::delete('/{attendance}', 'destroy');
