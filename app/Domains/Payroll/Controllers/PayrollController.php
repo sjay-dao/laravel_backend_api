@@ -80,4 +80,11 @@ class PayrollController extends Controller
             'data' => $this->service->details($payrollRun->id)
         ]);
     }
+
+    public function cancel(PayrollRun $payrollRun)
+    {
+        return response()->json(
+            $this->service->cancel($payrollRun)
+        );
+    }
 }

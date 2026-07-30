@@ -24,4 +24,6 @@ Route::middleware('auth:sanctum')
             '/{payrollRun}/details',
             'details'
         );
+
+        Route::post('/{payrollRun}/cancel', 'cancel');
 });

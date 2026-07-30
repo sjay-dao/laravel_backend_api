@@ -130,4 +130,17 @@ class PayrollService
     {
         return $this->details->listByRun($runId);
     }
+
+    public function cancel(PayrollRun $run)
+    {
+        if ($run->status === 'POSTED') {
+            abort(422, 'Posted payrolls cannot be cancelled.');
+        }
+
+        $run->update([
+            'status' => 'CANCELLED',
+        ]);
+
+        return $run->fresh();
+    }
 }
