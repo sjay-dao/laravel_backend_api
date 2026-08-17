@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Address;
-use App\Models\Branch;
+use App\Domains\System\Models\Branch;
 
 class BranchSeeder extends Seeder
 {

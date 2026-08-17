@@ -2,8 +2,8 @@
 
 namespace App\Domains\Employee\Models;
 
-use App\Models\Branch;
-use App\Models\User;
+use App\Domains\System\Models\Branch;
+use App\Domains\System\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Domains\Employee\Models\SalaryContract;

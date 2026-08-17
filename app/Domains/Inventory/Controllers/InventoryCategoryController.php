@@ -2,46 +2,37 @@
 
 namespace App\Domains\Inventory\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Domains\Inventory\Models\InventoryCategory;
 use App\Domains\Inventory\Requests\StoreInventoryCategoryRequest;
 use App\Domains\Inventory\Requests\UpdateInventoryCategoryRequest;
 use App\Domains\Inventory\Resources\InventoryCategoryResource;
 use App\Domains\Inventory\Services\InventoryCategoryService;
+use App\Domains\Shared\Controllers\BaseApiController;
+use Illuminate\Http\Request;
 
-use App\Domains\Shared\Responses\ApiResponse;
-use App\Domains\Shared\Responses\ApiPaginatedResponse;
-
-
-class InventoryCategoryController extends Controller
+class InventoryCategoryController extends BaseApiController
 {
-    protected InventoryCategoryService $service;
-
-    public function __construct(InventoryCategoryService $service)
-    {
-        $this->service = $service;
+    public function __construct(
+        protected InventoryCategoryService $service
+    ) {
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $paginator = $this->service->paginate();
+        $this->authorizeAbility($request, 'inventory.categories.view');
 
-        $paginator->setCollection(
-            InventoryCategoryResource::collection(
-                collect($paginator->items())
-            )->collection
-        );
-
-        return ApiPaginatedResponse::make(
-            $paginator,
+        return $this->paginated(
+            $this->service->paginate(),
+            InventoryCategoryResource::class,
             'Inventory Categories retrieved successfully.'
         );
     }
 
-    public function create(
-        StoreInventoryCategoryRequest $request
-    ) {
-        return ApiResponse::created(
+    public function store(StoreInventoryCategoryRequest $request)
+    {
+        $this->authorizeAbility($request, 'inventory.categories.create');
+
+        return $this->created(
             new InventoryCategoryResource(
                 $this->service->create(
                     $request->validated()
@@ -52,9 +43,12 @@ class InventoryCategoryController extends Controller
     }
 
     public function show(
-        InventoryCategory $inventoryCategory    
+        Request $request,
+        InventoryCategory $inventoryCategory
     ) {
-        return ApiResponse::success(
+        $this->authorizeAbility($request, 'inventory.categories.view');
+
+        return $this->resource(
             new InventoryCategoryResource(
                 $inventoryCategory
             )
@@ -65,7 +59,9 @@ class InventoryCategoryController extends Controller
         UpdateInventoryCategoryRequest $request,
         InventoryCategory $inventoryCategory
     ) {
-        return ApiResponse::success(
+        $this->authorizeAbility($request, 'inventory.categories.update');
+
+        return $this->resource(
             new InventoryCategoryResource(
                 $this->service->update(
                     $inventoryCategory,
@@ -76,14 +72,17 @@ class InventoryCategoryController extends Controller
         );
     }
 
-    public function delete(
+    public function destroy(
+        Request $request,
         InventoryCategory $inventoryCategory
     ) {
+        $this->authorizeAbility($request, 'inventory.categories.delete');
+
         $this->service->delete(
             $inventoryCategory
         );
 
-        return ApiResponse::deleted(
+        return $this->deleted(
             'Inventory Category deleted successfully.'
         );
     }

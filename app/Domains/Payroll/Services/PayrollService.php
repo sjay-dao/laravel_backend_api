@@ -88,8 +88,7 @@ class PayrollService
 
             $result = $this->computation->compute(
                 $employee->id,
-                $run->period_from->year,
-                $run->period_from->month
+                $run
             );
 
             $this->details->create([

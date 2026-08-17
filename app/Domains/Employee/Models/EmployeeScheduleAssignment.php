@@ -4,7 +4,7 @@ namespace App\Domains\Employee\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-use App\Models\User;
+use App\Domains\System\Models\User;
 
 class EmployeeScheduleAssignment extends Model
 {

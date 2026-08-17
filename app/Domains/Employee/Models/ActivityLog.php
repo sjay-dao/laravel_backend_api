@@ -2,7 +2,7 @@
 
 namespace App\Domains\Employee\Models;
 
-use App\Models\User;
+use App\Domains\System\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class ActivityLog extends Model

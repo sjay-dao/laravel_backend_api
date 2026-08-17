@@ -4,39 +4,39 @@ namespace App\Domains\Inventory\Controllers;
 
 use App\Domains\Inventory\Models\InventoryMovement;
 use App\Domains\Inventory\Requests\StoreInventoryMovementRequest;
+use App\Domains\Inventory\Requests\UpdateInventoryMovementRequest;
 use App\Domains\Inventory\Resources\InventoryMovementResource;
 use App\Domains\Inventory\Services\InventoryMovementService;
 use App\Domains\Shared\Controllers\BaseApiController;
-use App\Domains\Shared\Responses\ApiPaginatedResponse;
-use App\Domains\Shared\Responses\ApiResponse;
-use App\Domains\Inventory\Requests\UpdateInventoryMovementRequest;
+use Illuminate\Http\Request;
 
 class InventoryMovementController extends BaseApiController
 {
-    protected InventoryMovementService $service;
-
     public function __construct(
-        InventoryMovementService $service
+        protected InventoryMovementService $service
     ) {
-        $this->service = $service;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return ApiPaginatedResponse::make(
+        $this->authorizeAbility($request, 'inventory.movements.view');
+
+        return $this->paginated(
             $this->service->paginate(),
+            InventoryMovementResource::class,
             'Inventory Movements retrieved successfully.'
         );
     }
 
-    public function store(
-        StoreInventoryMovementRequest $request
-    ) {
+    public function store(StoreInventoryMovementRequest $request)
+    {
+        $this->authorizeAbility($request, 'inventory.movements.create');
+
         $movement = $this->service->create(
             $request->validated()
         );
 
-        return ApiResponse::created(
+        return $this->created(
             new InventoryMovementResource(
                 $movement->load([
                     'movementType',
@@ -51,9 +51,12 @@ class InventoryMovementController extends BaseApiController
     }
 
     public function show(
+        Request $request,
         InventoryMovement $inventoryMovement
     ) {
-        return ApiResponse::success(
+        $this->authorizeAbility($request, 'inventory.movements.view');
+
+        return $this->resource(
             new InventoryMovementResource(
                 $inventoryMovement->load([
                     'movementType',
@@ -70,14 +73,15 @@ class InventoryMovementController extends BaseApiController
     public function update(
         UpdateInventoryMovementRequest $request,
         InventoryMovement $movement
-    )
-    {
+    ) {
+        $this->authorizeAbility($request, 'inventory.movements.update');
+
         $movement = $this->service->update(
             $movement,
             $request->validated()
         );
 
-        return ApiResponse::success(
+        return $this->resource(
             new InventoryMovementResource(
                 $movement->load([
                     'movementType',
@@ -91,50 +95,44 @@ class InventoryMovementController extends BaseApiController
         );
     }
 
-    public function destroy()
+    public function destroy(Request $request)
     {
-        return ApiResponse::error(
-            'Inventory movements cannot be deleted.',
-            null,
-            405
-        );
+        $this->authorizeAbility($request, 'inventory.movements.delete');
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Inventory movements cannot be deleted.',
+        ], 405);
     }
 
     public function stock(
+        Request $request,
         int $inventoryObjectId
-    )
-    {
-        return ApiResponse::success(
+    ) {
+        $this->authorizeAbility($request, 'inventory.movements.view');
 
+        return $this->success(
             [
-
                 'inventory_object_id' => $inventoryObjectId,
-
-                'stock' => $this->service
-                    ->getStock(
-                        $inventoryObjectId
-                    )
-
+                'stock' => $this->service->getStock(
+                    $inventoryObjectId
+                ),
             ],
-
             'Current stock retrieved.'
-
         );
     }
 
     public function ledger(
+        Request $request,
         int $inventoryObjectId
-    )
-    {
-        return ApiResponse::success(
+    ) {
+        $this->authorizeAbility($request, 'inventory.movements.view');
 
+        return $this->success(
             $this->service->ledger(
                 $inventoryObjectId
             ),
-
             'Inventory ledger retrieved successfully.'
-
         );
     }
-    
 }

@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Domains\System\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class StoreRoleRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'code' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('roles', 'code'),
+            ],
+
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'description' => [
+                'nullable',
+                'string',
+            ],
+        ];
+    }
+}

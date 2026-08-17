@@ -5,6 +5,7 @@ namespace App\Domains\Shared\Controllers;
 use App\Http\Controllers\Controller;
 use App\Domains\Shared\Responses\ApiPaginatedResponse;
 use App\Domains\Shared\Responses\ApiResponse;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -30,6 +31,20 @@ abstract class BaseApiController extends Controller
         return ApiResponse::deleted($message);
     }
 
+    protected function authorizeAbility(
+        Request $request,
+        string $ability,
+        ?string $message = null
+    ): void {
+        if (! $request->user()?->can($ability)) {
+            abort(response()->json([
+                'success' => false,
+                'message' => $message
+                    ?? 'You do not have permission to perform this action.',
+            ], 403));
+        }
+    }
+
     protected function paginated(
         LengthAwarePaginator $paginator,
         string $resourceClass,
@@ -48,9 +63,10 @@ abstract class BaseApiController extends Controller
     }
 
     protected function resource(
-        JsonResource $resource,
+        mixed $resource,
         string $message = 'Success'
-    ) {
+    )
+    {
         return ApiResponse::success(
             $resource,
             $message

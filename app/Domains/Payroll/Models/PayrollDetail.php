@@ -4,6 +4,7 @@ namespace App\Domains\Payroll\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Domains\Employee\Models\Employee;
 use App\Domains\Employee\Models\SalaryContract;
+
 class PayrollDetail extends Model
 {
     protected $fillable = [

@@ -2,69 +2,79 @@
 
 namespace App\Domains\Employee\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
 use App\Domains\Employee\Requests\StoreEmployeeScheduleAssignmentRequest;
 use App\Domains\Employee\Requests\UpdateEmployeeScheduleAssignmentRequest;
-
-use App\Domains\Employee\Services\EmployeeScheduleAssignmentService;
-
 use App\Domains\Employee\Resources\EmployeeScheduleAssignmentResource;
+use App\Domains\Employee\Services\EmployeeScheduleAssignmentService;
+use App\Domains\Shared\Controllers\BaseApiController;
+use Illuminate\Http\Request;
 
-class EmployeeScheduleAssignmentController extends Controller
+class EmployeeScheduleAssignmentController extends BaseApiController
 {
-    public function __construct(
-        protected EmployeeScheduleAssignmentService $service
-    ) {
-    }
+    public function __construct(protected EmployeeScheduleAssignmentService $service) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        return EmployeeScheduleAssignmentResource::collection(
-            $this->service->paginate()
+        $this->authorizeAbility($request, 'employee.schedule.assign');
+
+        return $this->success(
+            EmployeeScheduleAssignmentResource::collection(
+                $this->service->paginate()
+            ),
+            'Schedule assignments retrieved successfully.'
         );
     }
 
-    public function show(int $assignment)
+    public function show(Request $request, int $assignment)
     {
-        return new EmployeeScheduleAssignmentResource(
-            $this->service->find($assignment)
+        $this->authorizeAbility($request, 'employee.schedule.assign');
+
+        return $this->resource(
+            new EmployeeScheduleAssignmentResource(
+                $this->service->find($assignment)
+            ),
+            'Schedule assignment retrieved successfully.'
         );
     }
 
     public function store(StoreEmployeeScheduleAssignmentRequest $request)
     {
-        $assignment = $this->service->create(
-            $request->validated(),
-            $request->user()
-        );
+        $this->authorizeAbility($request, 'employee.schedule.assign');
 
-        return new EmployeeScheduleAssignmentResource(
-            $assignment
-        );
-    }
-
-    public function update(
-        UpdateEmployeeScheduleAssignmentRequest $request,
-        int $assignment
-    ) {
-        $record = $this->service->update(
-            $assignment,
-            $request->validated()
-        );
-
-        return new EmployeeScheduleAssignmentResource(
-            $record
+        return $this->created(
+            new EmployeeScheduleAssignmentResource(
+                $this->service->create(
+                    $request->validated(),
+                    $request->user()
+                )
+            ),
+            'Schedule assignment created successfully.'
         );
     }
 
-    public function destroy(int $assignment)
+    public function update(UpdateEmployeeScheduleAssignmentRequest $request, int $assignment)
     {
+        $this->authorizeAbility($request, 'employee.schedule.assign');
+
+        return $this->resource(
+            new EmployeeScheduleAssignmentResource(
+                $this->service->update(
+                    $assignment,
+                    $request->validated()
+                )
+            ),
+            'Schedule assignment updated successfully.'
+        );
+    }
+
+    public function destroy(Request $request, int $assignment)
+    {
+        $this->authorizeAbility($request, 'employee.schedule.assign');
+
         $this->service->delete($assignment);
 
-        return response()->json([
-            'message' => 'Assignment deleted.'
-        ]);
+        return $this->deleted(
+            'Schedule assignment deleted successfully.'
+        );
     }
 }

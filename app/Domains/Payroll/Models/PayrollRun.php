@@ -3,6 +3,7 @@ namespace App\Domains\Payroll\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Domains\Payroll\Models\PayrollDetail;
+
 class PayrollRun extends Model
 {
     protected $fillable = [

@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Domains\Employee\Models\EmployeeScheduleAssignment;
 use App\Domains\Employee\Repositories\EmployeeScheduleAssignmentRepository;
-use App\Models\User;
+use App\Domains\System\Models\User;
 
 class EmployeeScheduleAssignmentService
 {

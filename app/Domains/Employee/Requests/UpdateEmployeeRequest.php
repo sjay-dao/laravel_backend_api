@@ -7,7 +7,14 @@ use Illuminate\Validation\Rule;
 
 class UpdateEmployeeRequest extends StoreEmployeeRequest
 {
-    public function authorize(): bool { return $this->user()?->can('update', $this->route('employee')) ?? false; }
+    public function authorize(): bool
+    {
+        $employee = $this->route('employee');
+
+        $result = $this->user()?->can('update', $employee) ?? false;
+
+        return $result;
+    }
     public function rules(): array
     {
         $rules = parent::rules();

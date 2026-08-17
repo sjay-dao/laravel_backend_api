@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 use App\Domains\Employee\Models\Employee;
-use App\Models\User;
+use App\Domains\System\Models\User;
 use App\Domains\Employee\Enums\AttendanceStatus;
 
 class AttendanceRecord extends Model

@@ -29,6 +29,35 @@ CREATE TABLE `addresses` (
   CONSTRAINT `addresses_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `attendance_records`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `attendance_records` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `employee_id` bigint(20) unsigned NOT NULL,
+  `attendance_date` date NOT NULL,
+  `status` enum('PRESENT','ABSENT','LEAVE','HOLIDAY','REST_DAY','HALF_DAY') NOT NULL DEFAULT 'PRESENT',
+  `time_in` time DEFAULT NULL,
+  `time_out` time DEFAULT NULL,
+  `worked_minutes` int(11) DEFAULT NULL,
+  `late_minutes` int(11) DEFAULT NULL,
+  `undertime_minutes` int(11) DEFAULT NULL,
+  `overtime_minutes` int(11) DEFAULT NULL,
+  `salary_contract_id` bigint(20) unsigned DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `created_by` bigint(20) unsigned DEFAULT NULL,
+  `updated_by` bigint(20) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `attendance_records_employee_id_attendance_date_unique` (`employee_id`,`attendance_date`),
+  KEY `attendance_records_created_by_foreign` (`created_by`),
+  KEY `attendance_records_updated_by_foreign` (`updated_by`),
+  CONSTRAINT `attendance_records_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`),
+  CONSTRAINT `attendance_records_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `attendance_records_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `branches`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -80,6 +109,265 @@ CREATE TABLE `email_otps` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `employee_activity_logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `employee_activity_logs` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `employee_id` bigint(20) unsigned DEFAULT NULL,
+  `subject_type` varchar(150) NOT NULL,
+  `subject_id` bigint(20) unsigned NOT NULL,
+  `action` varchar(100) NOT NULL,
+  `old_values` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`old_values`)),
+  `new_values` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`new_values`)),
+  `actor_id` bigint(20) unsigned DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` varchar(1000) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `employee_activity_logs_actor_id_foreign` (`actor_id`),
+  KEY `employee_activity_logs_employee_id_created_at_index` (`employee_id`,`created_at`),
+  KEY `employee_activity_logs_subject_type_subject_id_index` (`subject_type`,`subject_id`),
+  CONSTRAINT `employee_activity_logs_actor_id_foreign` FOREIGN KEY (`actor_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `employee_activity_logs_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `employee_attachments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `employee_attachments` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `employee_id` bigint(20) unsigned NOT NULL,
+  `category` varchar(50) NOT NULL,
+  `original_name` varchar(255) NOT NULL,
+  `path` varchar(255) NOT NULL,
+  `disk` varchar(50) NOT NULL DEFAULT 'local',
+  `mime_type` varchar(100) NOT NULL,
+  `size` bigint(20) unsigned NOT NULL,
+  `uploaded_by` bigint(20) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `employee_attachments_employee_id_foreign` (`employee_id`),
+  KEY `employee_attachments_uploaded_by_foreign` (`uploaded_by`),
+  CONSTRAINT `employee_attachments_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `employee_attachments_uploaded_by_foreign` FOREIGN KEY (`uploaded_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `employee_departments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `employee_departments` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(50) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `parent_id` bigint(20) unsigned DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `employee_departments_code_unique` (`code`),
+  KEY `employee_departments_parent_id_foreign` (`parent_id`),
+  CONSTRAINT `employee_departments_parent_id_foreign` FOREIGN KEY (`parent_id`) REFERENCES `employee_departments` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `employee_emergency_contacts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `employee_emergency_contacts` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `employee_id` bigint(20) unsigned NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `relationship` varchar(100) DEFAULT NULL,
+  `mobile_number` varchar(50) NOT NULL,
+  `phone_number` varchar(50) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `is_primary` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `employee_emergency_contacts_employee_id_foreign` (`employee_id`),
+  CONSTRAINT `employee_emergency_contacts_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `employee_positions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `employee_positions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(50) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `department_id` bigint(20) unsigned DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `employee_positions_code_unique` (`code`),
+  KEY `employee_positions_department_id_foreign` (`department_id`),
+  CONSTRAINT `employee_positions_department_id_foreign` FOREIGN KEY (`department_id`) REFERENCES `employee_departments` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `employee_role_permissions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `employee_role_permissions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `role_code` varchar(100) NOT NULL,
+  `permission` varchar(100) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `employee_role_permissions_role_code_permission_unique` (`role_code`,`permission`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `employee_salary_setups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `employee_salary_setups` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `employee_id` bigint(20) unsigned NOT NULL,
+  `basic_rate` decimal(15,2) NOT NULL,
+  `rate_type` varchar(20) NOT NULL DEFAULT 'monthly',
+  `pay_frequency` varchar(20) NOT NULL,
+  `currency` varchar(3) NOT NULL DEFAULT 'PHP',
+  `allowance_amount` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `effective_from` date NOT NULL,
+  `effective_to` date DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `created_by` bigint(20) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `employee_salary_setups_employee_id_effective_from_unique` (`employee_id`,`effective_from`),
+  KEY `employee_salary_setups_created_by_foreign` (`created_by`),
+  KEY `employee_salary_setups_effective_from_index` (`effective_from`),
+  KEY `employee_salary_setups_effective_to_index` (`effective_to`),
+  CONSTRAINT `employee_salary_setups_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `employee_salary_setups_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `employee_schedule_assignments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `employee_schedule_assignments` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `employee_id` bigint(20) unsigned NOT NULL,
+  `schedule_id` bigint(20) unsigned NOT NULL,
+  `effective_from` date NOT NULL,
+  `effective_to` date DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `assigned_by` bigint(20) unsigned DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `employee_schedule_assignments_assigned_by_foreign` (`assigned_by`),
+  KEY `employee_schedule_assignments_employee_id_effective_from_index` (`employee_id`,`effective_from`),
+  KEY `employee_schedule_assignments_schedule_id_index` (`schedule_id`),
+  CONSTRAINT `employee_schedule_assignments_assigned_by_foreign` FOREIGN KEY (`assigned_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `employee_schedule_assignments_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `employee_schedule_assignments_schedule_id_foreign` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `employee_transactions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `employee_transactions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `transaction_no` varchar(50) NOT NULL,
+  `employee_id` bigint(20) unsigned NOT NULL,
+  `type` varchar(30) NOT NULL,
+  `transaction_date` date NOT NULL,
+  `amount` decimal(15,2) NOT NULL,
+  `ledger_effect` decimal(15,2) NOT NULL,
+  `currency` varchar(3) NOT NULL DEFAULT 'PHP',
+  `reference_type` varchar(100) DEFAULT NULL,
+  `reference_no` varchar(100) DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'posted',
+  `reverses_transaction_id` bigint(20) unsigned DEFAULT NULL,
+  `created_by` bigint(20) unsigned DEFAULT NULL,
+  `voided_by` bigint(20) unsigned DEFAULT NULL,
+  `voided_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `employee_transactions_transaction_no_unique` (`transaction_no`),
+  UNIQUE KEY `employee_transactions_reverses_transaction_id_unique` (`reverses_transaction_id`),
+  KEY `employee_transactions_created_by_foreign` (`created_by`),
+  KEY `employee_transactions_voided_by_foreign` (`voided_by`),
+  KEY `employee_transactions_employee_id_transaction_date_id_index` (`employee_id`,`transaction_date`,`id`),
+  KEY `employee_transactions_type_index` (`type`),
+  KEY `employee_transactions_transaction_date_index` (`transaction_date`),
+  KEY `employee_transactions_status_index` (`status`),
+  CONSTRAINT `employee_transactions_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `employee_transactions_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`),
+  CONSTRAINT `employee_transactions_reverses_transaction_id_foreign` FOREIGN KEY (`reverses_transaction_id`) REFERENCES `employee_transactions` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `employee_transactions_voided_by_foreign` FOREIGN KEY (`voided_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `employees`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `employees` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `employee_no` varchar(50) NOT NULL,
+  `first_name` varchar(255) NOT NULL,
+  `middle_name` varchar(255) DEFAULT NULL,
+  `last_name` varchar(255) NOT NULL,
+  `suffix` varchar(30) DEFAULT NULL,
+  `birth_date` date DEFAULT NULL,
+  `gender` varchar(30) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `mobile_number` varchar(50) DEFAULT NULL,
+  `phone_number` varchar(50) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `branch_id` bigint(20) unsigned DEFAULT NULL,
+  `department_id` bigint(20) unsigned DEFAULT NULL,
+  `position_id` bigint(20) unsigned DEFAULT NULL,
+  `employment_status_id` bigint(20) unsigned DEFAULT NULL,
+  `hire_date` date DEFAULT NULL,
+  `regularization_date` date DEFAULT NULL,
+  `separation_date` date DEFAULT NULL,
+  `tin` varchar(50) DEFAULT NULL,
+  `sss_number` varchar(50) DEFAULT NULL,
+  `philhealth_number` varchar(50) DEFAULT NULL,
+  `pagibig_number` varchar(50) DEFAULT NULL,
+  `bank_name` varchar(255) DEFAULT NULL,
+  `bank_account_name` varchar(255) DEFAULT NULL,
+  `bank_account_number` varchar(255) DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `created_by` bigint(20) unsigned DEFAULT NULL,
+  `updated_by` bigint(20) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `employees_employee_no_unique` (`employee_no`),
+  UNIQUE KEY `employees_email_unique` (`email`),
+  KEY `employees_branch_id_foreign` (`branch_id`),
+  KEY `employees_department_id_foreign` (`department_id`),
+  KEY `employees_position_id_foreign` (`position_id`),
+  KEY `employees_created_by_foreign` (`created_by`),
+  KEY `employees_updated_by_foreign` (`updated_by`),
+  KEY `employees_last_name_first_name_index` (`last_name`,`first_name`),
+  KEY `employees_hire_date_index` (`hire_date`),
+  KEY `fk_employees_employment_status` (`employment_status_id`),
+  CONSTRAINT `employees_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `employees_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `employees_department_id_foreign` FOREIGN KEY (`department_id`) REFERENCES `employee_departments` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `employees_position_id_foreign` FOREIGN KEY (`position_id`) REFERENCES `employee_positions` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `employees_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_employees_employment_status` FOREIGN KEY (`employment_status_id`) REFERENCES `lookups` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `failed_jobs`;
@@ -354,6 +642,45 @@ CREATE TABLE `location_logs` (
   CONSTRAINT `location_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `lookup_types`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `lookup_types` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(100) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `lookup_types_code_unique` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `lookups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `lookups` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `lookup_type_id` bigint(20) unsigned NOT NULL,
+  `code` varchar(100) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `value` decimal(10,2) DEFAULT NULL,
+  `color` varchar(20) DEFAULT NULL,
+  `icon` varchar(100) DEFAULT NULL,
+  `sort_order` int(10) unsigned NOT NULL DEFAULT 0,
+  `is_system` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`metadata`)),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `lookups_lookup_type_id_code_unique` (`lookup_type_id`,`code`),
+  KEY `lookups_lookup_type_id_sort_order_index` (`lookup_type_id`,`sort_order`),
+  CONSTRAINT `lookups_lookup_type_id_foreign` FOREIGN KEY (`lookup_type_id`) REFERENCES `lookup_types` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -428,6 +755,59 @@ CREATE TABLE `password_reset_tokens` (
   `token` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `payroll_details`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `payroll_details` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `payroll_run_id` bigint(20) unsigned NOT NULL,
+  `employee_id` bigint(20) unsigned NOT NULL,
+  `salary_contract_id` bigint(20) unsigned DEFAULT NULL,
+  `present_days` int(11) NOT NULL DEFAULT 0,
+  `absent_days` int(11) NOT NULL DEFAULT 0,
+  `leave_days` int(11) NOT NULL DEFAULT 0,
+  `half_days` int(11) NOT NULL DEFAULT 0,
+  `worked_minutes` int(11) NOT NULL DEFAULT 0,
+  `basic_pay` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `allowances` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `overtime_pay` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `gross_pay` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `deductions` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `net_pay` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `payroll_details_payroll_run_id_employee_id_unique` (`payroll_run_id`,`employee_id`),
+  KEY `payroll_details_employee_id_foreign` (`employee_id`),
+  KEY `payroll_details_salary_contract_id_foreign` (`salary_contract_id`),
+  CONSTRAINT `payroll_details_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `payroll_details_payroll_run_id_foreign` FOREIGN KEY (`payroll_run_id`) REFERENCES `payroll_runs` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `payroll_details_salary_contract_id_foreign` FOREIGN KEY (`salary_contract_id`) REFERENCES `salary_contracts` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `payroll_runs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `payroll_runs` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `payroll_no` varchar(255) NOT NULL,
+  `period_from` date NOT NULL,
+  `period_to` date NOT NULL,
+  `pay_date` date NOT NULL,
+  `status` enum('DRAFT','COMPUTED','POSTED','CANCELLED') NOT NULL DEFAULT 'DRAFT',
+  `remarks` text DEFAULT NULL,
+  `created_by` bigint(20) unsigned DEFAULT NULL,
+  `updated_by` bigint(20) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `payroll_runs_payroll_no_unique` (`payroll_no`),
+  KEY `payroll_runs_created_by_foreign` (`created_by`),
+  KEY `payroll_runs_updated_by_foreign` (`updated_by`),
+  CONSTRAINT `payroll_runs_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`),
+  CONSTRAINT `payroll_runs_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `personal_access_tokens`;
@@ -588,6 +968,76 @@ CREATE TABLE `roles` (
   UNIQUE KEY `roles_code_unique` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `salary_contracts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `salary_contracts` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `employee_id` bigint(20) unsigned NOT NULL,
+  `pay_basis` enum('MONTHLY','DAILY','HOURLY','PIECE_RATE','COMMISSION','MIXED') NOT NULL,
+  `salary_rate` decimal(12,2) NOT NULL,
+  `effective_from` date NOT NULL,
+  `effective_to` date DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `remarks` text DEFAULT NULL,
+  `created_by` bigint(20) unsigned DEFAULT NULL,
+  `updated_by` bigint(20) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `salary_contracts_created_by_foreign` (`created_by`),
+  KEY `salary_contracts_updated_by_foreign` (`updated_by`),
+  KEY `salary_contracts_employee_id_effective_from_index` (`employee_id`,`effective_from`),
+  CONSTRAINT `salary_contracts_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`),
+  CONSTRAINT `salary_contracts_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `salary_contracts_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `schedule_days`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `schedule_days` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `schedule_id` bigint(20) unsigned NOT NULL,
+  `day_of_week` tinyint(3) unsigned NOT NULL,
+  `start_time` time DEFAULT NULL,
+  `end_time` time DEFAULT NULL,
+  `break_minutes` smallint(5) unsigned NOT NULL DEFAULT 60,
+  `required_minutes` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `is_rest_day` tinyint(1) NOT NULL DEFAULT 0,
+  `remarks` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `schedule_days_schedule_id_day_of_week_unique` (`schedule_id`,`day_of_week`),
+  CONSTRAINT `schedule_days_schedule_id_foreign` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `schedules`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `schedules` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `type` enum('FIXED','FLEXIBLE','ON_CALL','SHIFT','FIELD') NOT NULL,
+  `weekly_required_minutes` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `minimum_daily_minutes` smallint(5) unsigned DEFAULT NULL,
+  `maximum_daily_minutes` smallint(5) unsigned DEFAULT NULL,
+  `earliest_start` time DEFAULT NULL,
+  `latest_start` time DEFAULT NULL,
+  `latest_end` time DEFAULT NULL,
+  `core_start` time DEFAULT NULL,
+  `core_end` time DEFAULT NULL,
+  `approval_required` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `schedules_code_unique` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `sessions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -716,3 +1166,13 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (13,'2026_06_24_074
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (14,'2026_06_25_091955_create_branches_table',4);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (15,'2026_06_24_072343_create_address_table',5);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (16,'2026_07_02_054033_create_units_table',6);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (17,'2026_07_27_000000_create_employee_module_tables',7);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (18,'2026_07_28_000000_create_attendance_records_table',8);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (19,'2026_07_28_013949_create_salary_contracts_table',9);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (20,'2026_07_28_023512_create_schedules_table',10);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (21,'2026_07_28_024641_create_schedule_days_table',11);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (22,'2026_07_28_044232_create_employee_schedule_assignments_table',12);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (23,'2026_07_28_051928_create_lookup_types_table',13);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (25,'2026_07_28_051944_create_lookups_table',14);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (26,'2026_07_29_125822_create_payroll_runs_table',15);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (27,'2026_07_29_125916_create_payroll_details_table',16);

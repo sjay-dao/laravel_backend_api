@@ -9,6 +9,7 @@ $domains = [
     'Employee',
     "Reference",
     "Payroll",
+    "System"
 ];
 
 foreach ($domains as $domain) {

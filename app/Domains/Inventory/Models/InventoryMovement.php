@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Domains\Inventory\Models\Warehouse;
 use App\Domains\Inventory\Models\InventoryMovementItem;
 use App\Domains\Inventory\Models\InventoryMovementType;
-use App\Models\User;
-use App\Models\Branch;
+use App\Domains\System\Models\User;
+use App\Domains\System\Models\Branch;
 
 
 class InventoryMovement extends Model

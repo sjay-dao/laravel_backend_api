@@ -6,13 +6,13 @@ use App\Domains\Employee\Models\Employee;
 use App\Domains\Employee\Models\SalaryContract;
 use App\Domains\Employee\Models\AttendanceRecord;
 use App\Domains\Employee\Models\EmployeeTransaction;
-
+use App\Domains\Payroll\Models\PayrollRun;
+use Carbon\Carbon;
 class PayrollComputationService
 {
     public function compute(
         int $employeeId,
-        int $year,
-        int $month
+        PayrollRun $payrollRun
     ) {
 
         $employee = Employee::findOrFail($employeeId);
@@ -24,16 +24,23 @@ class PayrollComputationService
 
         $attendance = AttendanceRecord::query()
             ->where('employee_id', $employeeId)
-            ->whereYear('attendance_date', $year)
-            ->whereMonth('attendance_date', $month)
+            ->whereBetween('attendance_date', [
+                $payrollRun->period_from,
+                $payrollRun->period_to,
+            ])
             ->get();
-
+    
         $transactions = EmployeeTransaction::query()
             ->where('employee_id', $employeeId)
+            ->where('status', 'posted')
+            ->whereBetween('transaction_date', [
+                $payrollRun->period_from,
+                $payrollRun->period_to,
+            ])
             ->get();
 
         
-       $attendanceSummary =
+        $attendanceSummary =
             $this->summarizeAttendance($attendance);
 
         $transactionSummary =
