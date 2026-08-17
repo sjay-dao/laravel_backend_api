@@ -2,73 +2,75 @@
 
 namespace App\Domains\Employee\Controllers;
 
-use App\Domains\Employee\Requests\StoreSalaryContractRequest;
-use App\Domains\Employee\Requests\UpdateSalaryContractRequest;
-use App\Domains\Employee\Resources\SalaryContractResource;
-use App\Domains\Employee\Services\SalaryContractService;
+use App\Domains\Employee\Requests\StoreScheduleRequest;
+use App\Domains\Employee\Requests\UpdateScheduleRequest;
+use App\Domains\Employee\Resources\ScheduleResource;
+use App\Domains\Employee\Services\ScheduleService;
 use App\Domains\Shared\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 
-class SalaryContractController extends BaseApiController
+class ScheduleController extends BaseApiController
 {
-    public function __construct(protected SalaryContractService $service) {}
+    public function __construct(protected ScheduleService $service) {}
 
     public function index(Request $request)
     {
-        $this->authorizeAbility($request, 'employee.salary-contracts.view');
+        $this->authorizeAbility($request, 'employee.schedules.view');
 
         return $this->success(
-            SalaryContractResource::collection(
+            ScheduleResource::collection(
                 $this->service->index($request->all())
             )
         );
     }
 
-    public function show(Request $request, int $salaryContract)
+    public function show(Request $request, int $schedule)
     {
-        $this->authorizeAbility($request, 'employee.salary-contracts.view');
+        $this->authorizeAbility($request, 'employee.schedules.view');
 
         return $this->resource(
-            new SalaryContractResource(
-                $this->service->find($salaryContract)
+            new ScheduleResource(
+                $this->service->find($schedule)
             )
         );
     }
 
-    public function store(StoreSalaryContractRequest $request)
+    public function store(StoreScheduleRequest $request)
     {
-        $this->authorizeAbility($request, 'employee.salary-contracts.create');
+        $this->authorizeAbility($request, 'employee.schedules.create');
 
         return $this->created(
-            new SalaryContractResource(
-                $this->service->store($request->validated())
+            new ScheduleResource(
+                $this->service->store(
+                    $request->validated()
+                )
             )
         );
     }
 
-    public function update(UpdateSalaryContractRequest $request, int $salaryContract)
+    public function update(UpdateScheduleRequest $request, int $schedule)
     {
-        $this->authorizeAbility($request, 'employee.salary-contracts.update');
+        $this->authorizeAbility($request, 'employee.schedules.update');
 
         return $this->resource(
-            new SalaryContractResource(
+            new ScheduleResource(
                 $this->service->update(
-                    $salaryContract,
+                    $schedule,
                     $request->validated()
                 )
             ),
-            'Salary contract updated successfully.'
+            'Schedule updated successfully.'
         );
     }
 
-    public function destroy(Request $request, int $salaryContract)
+    public function destroy(Request $request, int $schedule)
     {
-        $this->authorizeAbility($request, 'employee.salary-contracts.delete');
+        $this->authorizeAbility($request, 'employee.schedules.delete');
 
-        $this->service->delete($salaryContract);
+        $this->service->delete($schedule);
 
         return $this->deleted(
-            'Salary contract deleted successfully.'
+            'Schedule deleted successfully.'
         );
     }
 }
