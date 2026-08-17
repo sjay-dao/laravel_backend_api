@@ -2,56 +2,50 @@
 
 namespace Database\Seeders;
 
+use App\Domains\Reference\Models\Barangay;
+use App\Domains\Reference\Models\Branch;
 use Illuminate\Database\Seeder;
-use App\Models\Address;
-use App\Domains\System\Models\Branch;
-
+use App\Domains\System\Models\PsgcBarangay;
 class BranchSeeder extends Seeder
 {
     public function run(): void
     {
         $branches = [
-            [
-                'code' => 'MNL001',
-                'name' => 'Manila Main Branch',
-            ],
-            [
-                'code' => 'QC001',
-                'name' => 'Quezon City Branch',
-            ],
-            [
-                'code' => 'MKT001',
-                'name' => 'Makati Branch',
-            ],
-            [
-                'code' => 'PSG001',
-                'name' => 'Pasig Branch',
-            ],
-            [
-                'code' => 'CLN001',
-                'name' => 'Caloocan Branch',
-            ],
+            ['code' => 'MNL001', 'name' => 'Manila Main Branch'],
+            ['code' => 'QC001', 'name' => 'Quezon City Branch'],
+            ['code' => 'MKT001', 'name' => 'Makati Branch'],
+            ['code' => 'PSG001', 'name' => 'Pasig Branch'],
+            ['code' => 'CLN001', 'name' => 'Caloocan Branch'],
         ];
 
-        foreach ($branches as $item) {
+        $barangayIds = PsgcBarangay::query()
+            ->inRandomOrder()
+            ->limit(count($branches))
+            ->pluck('id')
+            ->values();
 
-            $address = Address::create([
-                'label' => $item['name'],
-                'address_line_1' => fake()->streetAddress(),
-                'address_line_2' => fake()->secondaryAddress(),
-                'barangay_id' => rand(1, 1000), // adjust to your PSGC data
-                'postal_code' => fake()->postcode(),
-                'latitude' => fake()->latitude(),
-                'longitude' => fake()->longitude(),
-                'is_default' => true,
-            ]);
-
-            Branch::create([
-                'code' => $item['code'],
-                'name' => $item['name'],
-                'address_id' => $address->id,
-                'is_active' => true,
-            ]);
+        foreach ($branches as $index => $branch) {
+            Branch::updateOrCreate(
+                [
+                    'code' => $branch['code'],
+                ],
+                [
+                    'name' => $branch['name'],
+                    'address' => fake()->streetAddress(),
+                    'barangay_id' => $barangayIds[$index] ?? null,
+                    'branch_type' => fake()->randomElement([
+                        'MAIN',
+                        'SATELLITE',
+                    ]),
+                    'branch_category' => fake()->randomElement([
+                        'A',
+                        'B',
+                        'C',
+                    ]),
+                    'service_bay_count' => fake()->numberBetween(0, 10),
+                    'is_active' => true,
+                ]
+            );
         }
     }
 }

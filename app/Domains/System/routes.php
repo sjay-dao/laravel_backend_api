@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Domains\System\Controllers\RoleController;
 use App\Domains\System\Controllers\PermissionController;    
 use App\Domains\System\Controllers\UserController;
+use App\Domains\System\Controllers\PsgcBarangayController;
 
 Route::middleware('auth:sanctum')
     ->prefix('system')
@@ -74,3 +75,15 @@ Route::middleware('auth:sanctum')
 
 
 });
+
+
+Route::prefix('system')
+    ->controller(PsgcBarangayController::class)
+    ->group(function () {
+
+        Route::get(
+            '/barangay/options',
+            'options'
+        );
+
+    });
