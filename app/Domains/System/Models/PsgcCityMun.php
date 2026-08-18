@@ -10,6 +10,10 @@ class PsgcCityMun extends Model
 
     public function province()
     {
-        return $this->belongsTo(PsgcProvince::class);
+        return $this->belongsTo(
+            PsgcProvince::class,
+            'province_prefix',
+            'prefix'
+        );
     }
 }

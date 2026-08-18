@@ -4,6 +4,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Domains\Reference\Controllers\ReferenceController;
 use App\Domains\Reference\Controllers\BranchController;
+use App\Domains\Reference\Controllers\SupplierController;
+use App\Domains\Reference\Controllers\CustomerController;
 
 Route::middleware('auth:sanctum')
     ->prefix('references')
@@ -26,7 +28,7 @@ Route::middleware('auth:sanctum')
 
 
 Route::middleware('auth:sanctum')
-    ->prefix('system/branches')
+    ->prefix('references/branches')
     ->controller(BranchController::class)
     ->group(function () {
 
@@ -42,4 +44,35 @@ Route::middleware('auth:sanctum')
 
         Route::delete('/{branch}', 'destroy');
 
+    });
+
+Route::middleware('auth:sanctum')
+    ->prefix('references/suppliers')
+    ->controller(SupplierController::class)
+    ->group(function () {
+
+        Route::get('/', 'index');
+
+        Route::get('/options', 'options');
+
+        Route::get('/{supplier}', 'show');
+
+        Route::post('/', 'store');
+
+        Route::patch('/{supplier}', 'update');
+
+        Route::delete('/{supplier}', 'destroy');
+
+    });
+
+Route::middleware('auth:sanctum')
+    ->prefix('references/customers')
+    ->controller(CustomerController::class)
+    ->group(function () {
+        Route::get('/', 'index');
+        Route::get('/options', 'options');
+        Route::get('/{customer}', 'show');
+        Route::post('/', 'store');
+        Route::patch('/{customer}', 'update');
+        Route::delete('/{customer}', 'destroy');
     });

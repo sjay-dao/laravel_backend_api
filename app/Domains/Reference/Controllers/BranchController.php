@@ -19,7 +19,7 @@ class BranchController extends BaseApiController
 
     public function index(Request $request)
     {
-        $this->authorizeAbility($request, 'system.branches.view');
+        $this->authorizeAbility($request, 'reference.branches.view');
 
         $branches = $this->service->paginate(
             $request->integer('per_page', 15),
@@ -35,7 +35,7 @@ class BranchController extends BaseApiController
 
     public function show(Request $request, Branch $branch)
     {
-        $this->authorizeAbility($request, 'system.branches.view');
+        $this->authorizeAbility($request, 'reference.branches.view');
 
         return $this->resource(
             new BranchResource(
@@ -50,7 +50,7 @@ class BranchController extends BaseApiController
     {
         $this->authorizeAbility(
             $request,
-            'system.branches.create'
+            'reference.branches.create'
         );
 
         $branch = $this->service->create(
@@ -68,7 +68,7 @@ class BranchController extends BaseApiController
     ) {
         $this->authorizeAbility(
             $request,
-            'system.branches.update'
+            'reference.branches.update'
         );
 
         $branch = $this->service->update(
@@ -87,7 +87,7 @@ class BranchController extends BaseApiController
     ) {
         $this->authorizeAbility(
             $request,
-            'system.branches.delete'
+            'reference.branches.delete'
         );
 
         $this->service->delete($branch);
@@ -99,7 +99,7 @@ class BranchController extends BaseApiController
     {
         $this->authorizeAbility(
             $request,
-            'system.branches.view'
+            'reference.branches.view'
         );
 
         return $this->success(

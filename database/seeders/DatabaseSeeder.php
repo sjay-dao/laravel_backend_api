@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
             UnitSeeder::class,
             EmployeePermissionSeeder::class,
             LookupTypeSeeder::class,
+            CustomerSeeder::class,
+            SupplierSeeder::class,
         ]);
     }
 }

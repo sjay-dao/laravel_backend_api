@@ -3,22 +3,25 @@
 namespace App\Domains\Reference\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class StoreBranchRequest extends FormRequest
+class UpdateBranchRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('reference.branches.create') ?? false;
+        return $this->user()?->can('reference.branches.update') ?? false;
     }
 
     public function rules(): array
     {
+        $branch = $this->route('branch');
+
         return [
             'code' => [
                 'required',
                 'string',
                 'max:30',
-                'unique:branches,code',
+                Rule::unique('branches', 'code')->ignore($branch),
             ],
 
             'name' => [

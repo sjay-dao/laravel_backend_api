@@ -6,9 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class PsgcProvince extends Model
 {
-     protected $table = 'psgc_province';
-     public function region()
+    protected $table = 'psgc_province';
+
+    public function region()
     {
-        return $this->belongsTo(PsgcRegion::class);
+        return $this->belongsTo(
+            PsgcRegion::class,
+            'region_prefix',
+            'prefix'
+        );
     }
 }
