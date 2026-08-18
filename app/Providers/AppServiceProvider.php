@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Domains\Employee\Models\Employee;
 use App\Domains\Employee\Policies\EmployeePolicy;
+use App\Domains\Purchasing\Contracts\PurchasingAccountingBoundary;
+use App\Domains\Purchasing\Services\NullPurchasingAccountingBoundary;
 use App\Domains\System\Models\User;
 use App\Domains\System\Services\AuthorizationService;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -14,7 +16,10 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        $this->app->bind(
+            PurchasingAccountingBoundary::class,
+            NullPurchasingAccountingBoundary::class
+        );
     }
 
     public function boot(): void

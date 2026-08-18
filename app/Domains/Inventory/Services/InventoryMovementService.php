@@ -10,6 +10,8 @@ use App\Domains\Inventory\Repositories\InventoryObjectUnitRepository;
 use App\Domains\Inventory\Requests\UpdateInventoryMovementRequest;
 use App\Domains\Inventory\Resources\InventoryMovementResource;
 use App\Domains\Inventory\Repositories\InventoryReservationRepository;
+use App\Domains\Purchasing\Models\GoodsReceipt;
+use App\Domains\Purchasing\Models\SupplierReturn;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -157,6 +159,14 @@ class InventoryMovementService
         InventoryMovement $movement,
         array $data): InventoryMovement 
     {
+
+        if (in_array($movement->reference_type, [
+            GoodsReceipt::class,
+            GoodsReceipt::class . ':reversal',
+            SupplierReturn::class,
+        ], true)) {
+            abort(422, 'Purchasing-generated inventory movements are immutable. Use the originating document reversal or return workflow.');
+        }
 
         return DB::transaction(function () use (
             $movement,
