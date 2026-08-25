@@ -10,7 +10,8 @@ use App\Domains\Inventory\Controllers\InventoryMovementController;
 use App\Domains\Inventory\Controllers\InventoryReservationController;
 use App\Domains\Inventory\Controllers\InventoryStockController;
 
-Route::prefix('inventory')->group(function () {
+Route::middleware('auth:sanctum')
+->prefix('inventory')->group(function () {
 
     Route::get(
         'movements/stocks/{inventoryObject}',
@@ -25,6 +26,13 @@ Route::prefix('inventory')->group(function () {
         [
             InventoryMovementController::class,
             'ledger'
+        ]
+    );
+    
+    Route::get('inventory-objects/options', 
+         [
+            InventoryObjectController::class,
+            'options'
         ]
     );
 

@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-use App\Domains\Employee\Models\Employee;
-use App\Domains\Employee\Policies\EmployeePolicy;
 use App\Domains\Purchasing\Contracts\PurchasingAccountingBoundary;
 use App\Domains\Purchasing\Services\NullPurchasingAccountingBoundary;
 use App\Domains\System\Models\User;
@@ -24,7 +22,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Gate::policy(Employee::class, EmployeePolicy::class);
 
         Gate::before(function (User $user, string $ability) {
             if (str_contains($ability, '.')) {

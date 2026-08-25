@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             LookupTypeSeeder::class,
             CustomerSeeder::class,
             SupplierSeeder::class,
+            SalesOrderStatusSeeder::class,
         ]);
     }
 }

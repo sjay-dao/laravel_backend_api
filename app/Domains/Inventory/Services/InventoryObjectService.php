@@ -12,12 +12,15 @@ use Illuminate\Database\Eloquent\Model;
 class InventoryObjectService extends BaseCrudService
 {
     protected InventoryObjectUnitRepository $inventoryObjectUnitRepository;
+    protected InventoryObjectRepository $inventoryObjectRepository;
 
     public function __construct(
         InventoryObjectRepository $repository,
+        InventoryObjectRepository $inventoryObjectRepository,
         InventoryObjectUnitRepository $inventoryObjectUnitRepository
     ) {
         $this->repository = $repository;
+         $this->inventoryObjectRepository = $inventoryObjectRepository;
         $this->inventoryObjectUnitRepository = $inventoryObjectUnitRepository;
     }
 
@@ -72,5 +75,10 @@ class InventoryObjectService extends BaseCrudService
 
             return $this->repository->findById($updated->id);
         });
+    }
+
+    public function options()
+    {
+        return $this->inventoryObjectRepository->options();
     }
 }

@@ -17,5 +17,26 @@ class InventoryObjectRepository extends BaseRepository
     {
         $this->model = new InventoryObject();
     }
+
+    public function options()
+    {
+        return $this->model
+            ->with([
+                'category:id,name',
+                'baseUnit:id,name',
+            ])
+            ->where('is_active', true)
+            ->where('is_sellable', true)
+            ->orderBy('name')
+            ->get([
+                'id',
+                'code',
+                'name',
+                'inventory_category_id',
+                'unit_id',
+                'track_inventory',
+                'is_sellable',
+            ]);
+    }
     
 }

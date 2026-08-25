@@ -88,4 +88,16 @@ class InventoryObjectController extends BaseApiController
             'Inventory object deleted successfully.'
         );
     }
+
+     public function options(Request $request)
+    {
+        $this->authorizeAbility(
+            $request,
+            'inventory.products.view'
+        );
+
+        return $this->success(
+            $this->service->options()
+        );
+    }
 }
