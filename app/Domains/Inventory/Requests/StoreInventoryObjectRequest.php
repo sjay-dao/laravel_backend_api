@@ -28,6 +28,29 @@ class StoreInventoryObjectRequest extends FormRequest
                 'max:255',
             ],
 
+            'brand' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+
+            'variant' => [
+                'nullable',
+                'string',
+                'max:150',
+            ],
+
+            'packaging_description' => [
+                'nullable',
+                'string',
+                'max:150',
+            ],
+
+            'specification' => [
+                'nullable',
+                'string',
+            ],
+
             'inventory_category_id' => [
                 'nullable',
                 'exists:inventory_categories,id',

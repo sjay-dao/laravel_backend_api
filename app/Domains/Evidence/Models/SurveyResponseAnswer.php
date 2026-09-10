@@ -1,0 +1,3 @@
+<?php
+namespace App\Domains\Evidence\Models; use Illuminate\Database\Eloquent\Model;
+class SurveyResponseAnswer extends Model { protected $fillable=['survey_response_id','survey_question_id','survey_question_option_id','raw_value','raw_text','answered_at']; protected $casts=['raw_value'=>'array','answered_at'=>'datetime']; public function response(){return $this->belongsTo(SurveyResponse::class,'survey_response_id');} public function question(){return $this->belongsTo(SurveyQuestion::class,'survey_question_id');} public function option(){return $this->belongsTo(SurveyQuestionOption::class,'survey_question_option_id');} }

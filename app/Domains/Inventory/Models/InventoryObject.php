@@ -2,6 +2,8 @@
 
 namespace App\Domains\Inventory\Models;
 
+use App\Domains\Evidence\Models\EvidenceRecord;
+use App\Domains\Evidence\Models\EvidenceReconciliation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -14,6 +16,10 @@ class InventoryObject extends Model
     protected $fillable = [
         'code',
         'name',
+        'brand',
+        'variant',
+        'packaging_description',
+        'specification',
         'inventory_category_id',
         'unit_id',
         'track_inventory',
@@ -49,5 +55,15 @@ class InventoryObject extends Model
             InventoryObjectUnit::class,
             'inventory_object_id'
         );
+    }
+
+    public function evidenceRecords()
+    {
+        return $this->hasMany(EvidenceRecord::class);
+    }
+
+    public function evidenceReconciliations()
+    {
+        return $this->hasMany(EvidenceReconciliation::class);
     }
 }

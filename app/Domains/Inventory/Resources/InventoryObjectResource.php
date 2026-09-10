@@ -17,6 +17,14 @@ class InventoryObjectResource extends JsonResource
 
             'name' => $this->name,
 
+            'brand' => $this->brand,
+
+            'variant' => $this->variant,
+
+            'packaging_description' => $this->packaging_description,
+
+            'specification' => $this->specification,
+
             'track_inventory' => $this->track_inventory,
 
             'is_sellable' => $this->is_sellable,

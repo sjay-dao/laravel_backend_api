@@ -1,5 +1,6 @@
 <?php
 namespace App\Domains\Reference\Models;
+use App\Domains\Evidence\Models\SupplierProductObservation;
 use App\Domains\System\Models\PsgcBarangay;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -27,5 +28,10 @@ class Supplier extends Model
             PsgcBarangay::class,
             'barangay_id'
         );
+    }
+
+    public function productObservations()
+    {
+        return $this->hasMany(SupplierProductObservation::class);
     }
 }
