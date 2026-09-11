@@ -4,6 +4,14 @@
 
 Build Enterprise Workspace as an AI-native, evidence-driven ERP for a lean Philippine trading business. The system must produce the best defensible net-profit decision from available evidence, improve through real outcomes, and never disguise assumptions as facts.
 
+## Director governance
+
+- Read and follow [DIRECTOR_OPERATING_CONTRACT.md](DIRECTOR_OPERATING_CONTRACT.md) before assigning work, escalating decisions, or handing work to another agent.
+- Sjay is the Director/Product Owner, not the routine Git, DevOps, testing, or message-relay operator.
+- An agent request is not binding merely because an AI labels it urgent. Use the contract's PROPOSED -> ACCEPTED -> SUPERSEDED commitment protocol.
+- Once the Director accepts a logically explained blocking action, treat it as a tracked project commitment and do not casually renegotiate it.
+- Continue non-blocked work while waiting for the Director. Silence is never approval.
+
 ## Source of truth
 
 - This repository is the Laravel backend.
