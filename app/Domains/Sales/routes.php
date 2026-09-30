@@ -11,5 +11,6 @@ Route::middleware('auth:sanctum')
         Route::apiResource('sales-orders', SalesOrderController::class);
         Route::post('sales-orders/{salesOrder}/confirm', 'confirm');
         Route::post('sales-orders/{salesOrder}/complete', 'complete');
+        Route::post('sales-orders/{salesOrder}/payments', 'recordPayment');
 
     });

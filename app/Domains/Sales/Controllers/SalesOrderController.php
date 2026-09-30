@@ -5,9 +5,11 @@ namespace App\Domains\Sales\Controllers;
 use App\Domains\Sales\Models\SalesOrder;
 use App\Domains\Sales\Repositories\SalesOrderRepository;
 use App\Domains\Sales\Requests\CompleteSalesOrderRequest;
+use App\Domains\Sales\Requests\StoreSalesOrderPaymentRequest;
 use App\Domains\Sales\Requests\StoreSalesOrderRequest;
 use App\Domains\Sales\Requests\UpdateSalesOrderRequest;
 use App\Domains\Sales\Resources\SalesOrderResource;
+use App\Domains\Sales\Services\SalesOrderPaymentService;
 use App\Domains\Sales\Services\SalesOrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -80,5 +82,10 @@ class SalesOrderController
     public function complete(CompleteSalesOrderRequest $request, SalesOrder $salesOrder): SalesOrderResource
     {
         return new SalesOrderResource($this->service->complete($salesOrder, $request->validated(), (int) $request->user()->id));
+    }
+
+    public function recordPayment(StoreSalesOrderPaymentRequest $request, SalesOrder $salesOrder, SalesOrderPaymentService $payments): SalesOrderResource
+    {
+        return new SalesOrderResource($payments->record($salesOrder, $request->validated(), (int) $request->user()->id));
     }
 }

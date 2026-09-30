@@ -57,4 +57,9 @@ class SalesOrder extends Model
     {
         return $this->belongsTo(Reference::class);
     }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(SalesOrderPayment::class);
+    }
 }

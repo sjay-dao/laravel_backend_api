@@ -23,6 +23,7 @@ class SalesOrderLotCompletionTest extends InventoryLotFoundationTest
             $t->text('description')->nullable();
         });
         (require database_path('migrations/2026_09_30_010000_add_sales_lot_allocation_movement_link.php'))->up();
+        (require database_path('migrations/2026_10_01_000000_create_sales_order_payments.php'))->up();
         $now = now();
         DB::table('lookup_types')->insert(['id' => 1, 'code' => 'SALES_ORDER_STATUS', 'name' => 'Sales order status', 'created_at' => $now, 'updated_at' => $now]);
         DB::table('lookups')->insert([

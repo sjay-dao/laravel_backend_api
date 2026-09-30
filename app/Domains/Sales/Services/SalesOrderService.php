@@ -5,6 +5,7 @@ namespace App\Domains\Sales\Services;
 use App\Domains\Inventory\Models\InventoryMovement;
 use App\Domains\Sales\Models\SalesOrder;
 use App\Domains\Sales\Models\SalesOrderItem;
+use App\Domains\Sales\Models\SalesOrderPayment;
 use App\Domains\Sales\Repositories\SalesOrderRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -39,6 +40,7 @@ class SalesOrderService
                 'customer',
                 'branch',
                 'status',
+                'payments.receivedBy',
                 'items.inventory',
                 'items.unit',
             ]);
@@ -115,6 +117,11 @@ class SalesOrderService
             $statusCode = (string) DB::table('lookups')->where('id', $order->status_id)->value('code');
             if ($statusCode !== 'CONFIRMED') {
                 throw new InvalidArgumentException('Only confirmed sales orders can be completed.');
+            }
+            $totalCents = (int) round(((float) $order->total_amount) * 100);
+            $paidCents = (int) SalesOrderPayment::query()->where('sales_order_id', $order->id)->lockForUpdate()->sum('applied_amount_cents');
+            if ($paidCents < $totalCents) {
+                $this->invalid('payments', 'The sales order must be fully paid before it can be completed.');
             }
             $warehouse = DB::table('warehouses')->where('id', $data['warehouse_id'])->where('is_active', true)->lockForUpdate()->first();
             if (! $warehouse || (int) $warehouse->branch_id !== (int) $order->branch_id) {
@@ -208,6 +215,7 @@ class SalesOrderService
                 'customer',
                 'branch',
                 'status',
+                'payments.receivedBy',
                 'items.inventory',
                 'items.unit',
                 'items.lotAllocations.inventoryLot.supplier',

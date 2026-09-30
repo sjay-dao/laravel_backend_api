@@ -11,7 +11,7 @@ class SalesOrderRepository
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         return SalesOrder::query()
-            ->with(['customer', 'branch', 'status', 'items.inventory', 'items.unit', 'items.lotAllocations.inventoryLot.supplier', 'items.lotAllocations.inventoryLot.warehouse'])
+            ->with(['customer', 'branch', 'status', 'payments.receivedBy', 'items.inventory', 'items.unit', 'items.lotAllocations.inventoryLot.supplier', 'items.lotAllocations.inventoryLot.warehouse'])
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('order_no', 'like', "%{$search}%")
@@ -33,7 +33,7 @@ class SalesOrderRepository
     public function find(int $id): SalesOrder
     {
         return SalesOrder::query()
-            ->with(['customer', 'branch', 'status', 'items.inventory', 'items.unit', 'items.lotAllocations.inventoryLot.supplier', 'items.lotAllocations.inventoryLot.warehouse'])
+            ->with(['customer', 'branch', 'status', 'payments.receivedBy', 'items.inventory', 'items.unit', 'items.lotAllocations.inventoryLot.supplier', 'items.lotAllocations.inventoryLot.warehouse'])
             ->findOrFail($id);
     }
 

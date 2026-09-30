@@ -9,6 +9,11 @@ class SalesOrderResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $payments = $this->relationLoaded('payments') ? $this->payments : collect();
+        $totalCents = (int) round(((float) $this->total_amount) * 100);
+        $paidCents = (int) $payments->sum('applied_amount_cents');
+        $balanceCents = max(0, $totalCents - $paidCents);
+
         return [
             'id' => $this->id,
             'order_no' => $this->order_no,
@@ -35,6 +40,22 @@ class SalesOrderResource extends JsonResource
             'tax_amount' => $this->tax_amount,
             'total_amount' => $this->total_amount,
             'remarks' => $this->remarks,
+            'payment_summary' => [
+                'status' => $paidCents === 0 ? 'UNPAID' : ($balanceCents > 0 ? 'PARTIALLY_PAID' : 'PAID'),
+                'paid_cents' => $paidCents,
+                'balance_cents' => $balanceCents,
+            ],
+            'payments' => $payments->map(fn ($payment) => [
+                'id' => $payment->id,
+                'payment_no' => $payment->payment_no,
+                'method' => $payment->method,
+                'tendered_amount_cents' => $payment->tendered_amount_cents,
+                'applied_amount_cents' => $payment->applied_amount_cents,
+                'change_cents' => $payment->change_cents,
+                'reference' => $payment->reference,
+                'received_at' => $payment->received_at?->toISOString(),
+                'received_by' => $payment->receivedBy ? ['id' => $payment->receivedBy->id, 'name' => $payment->receivedBy->name] : null,
+            ]),
             'items' => $this->items->map(fn ($item) => [
                 'id' => $item->id,
                 'inventory' => [
