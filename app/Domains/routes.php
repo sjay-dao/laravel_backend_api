@@ -10,6 +10,7 @@ $domains = [
     'Reference',
     'Payroll',
     'Evidence',
+    'Dashboard',
 ];
 
 foreach ($domains as $domain) {
@@ -19,4 +20,3 @@ foreach ($domains as $domain) {
         require $path;
     }
 }
-
