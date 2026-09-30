@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Domains\Sales\Models\SalesOrder;
+use App\Domains\Sales\Resources\SalesOrderResource;
 use App\Domains\Sales\Services\SalesOrderService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -26,9 +27,9 @@ class SalesOrderPricingTest extends SalesOrderLotCompletionTest
     public function test_wholesale_tiers_resolve_for_each_quantity_range(): void
     {
         $this->tiers();
-        $this->assertSame(4200000, $this->createPricedOrder('WHOLESALE', 2)->items->first()->list_unit_price_cents);
-        $this->assertSame(4050000, $this->createPricedOrder('WHOLESALE', 4)->items->first()->list_unit_price_cents);
-        $this->assertSame(3900000, $this->createPricedOrder('WHOLESALE', 6)->items->first()->list_unit_price_cents);
+        $this->assertSame(4250000, $this->createPricedOrder('WHOLESALE', 3)->items->first()->list_unit_price_cents);
+        $this->assertSame(4050000, $this->createPricedOrder('WHOLESALE', 6)->items->first()->list_unit_price_cents);
+        $this->assertSame(3900000, $this->createPricedOrder('WHOLESALE', 11)->items->first()->list_unit_price_cents);
     }
 
     public function test_manual_discount_is_preserved_and_cannot_make_price_negative(): void
@@ -50,7 +51,21 @@ class SalesOrderPricingTest extends SalesOrderLotCompletionTest
         $this->tiers();
         $wholesale = $this->createPricedOrder('WHOLESALE', 3);
         DB::table('inventory_wholesale_price_tiers')->where('inventory_object_id', 1)->where('min_quantity', 3)->update(['unit_price_cents' => 3500000]);
-        $this->assertSame(4050000, (int) DB::table('sales_order_items')->where('sales_order_id', $wholesale->id)->value('final_unit_price_cents'));
+        $this->assertSame(4250000, (int) DB::table('sales_order_items')->where('sales_order_id', $wholesale->id)->value('final_unit_price_cents'));
+    }
+
+    public function test_resource_exposes_backend_resolved_pricing_snapshots(): void
+    {
+        $order = $this->createPricedOrder('RETAIL', 2, 200000);
+        $resource = (new SalesOrderResource($order))->toArray(request());
+
+        $this->assertSame('RETAIL', $resource['sale_type']);
+        $this->assertSame('4000.00', $order->discount_amount);
+        $this->assertSame('86000.00', $order->total_amount);
+        $this->assertSame(4500000, $resource['items'][0]['list_unit_price_cents']);
+        $this->assertSame(200000, $resource['items'][0]['discount_cents']);
+        $this->assertSame(4300000, $resource['items'][0]['final_unit_price_cents']);
+        $this->assertSame(8600000, $resource['items'][0]['line_total_cents']);
     }
 
     public function test_no_matching_wholesale_tier_and_closed_order_repricing_are_rejected(): void
@@ -58,7 +73,7 @@ class SalesOrderPricingTest extends SalesOrderLotCompletionTest
         try {
             $this->createPricedOrder('WHOLESALE', 1);
             $this->fail('Expected missing-tier failure.');
-        } catch (InvalidArgumentException) {
+        } catch (ValidationException) {
         }
         $this->assertDatabaseCount('sales_orders', 0);
         $order = $this->createPricedOrder('RETAIL', 1);
@@ -85,9 +100,9 @@ class SalesOrderPricingTest extends SalesOrderLotCompletionTest
     {
         DB::table('inventory_wholesale_price_tiers')->delete();
         DB::table('inventory_wholesale_price_tiers')->insert([
-            ['inventory_object_id' => 1, 'min_quantity' => 1, 'max_quantity' => 2, 'unit_price_cents' => 4200000, 'created_at' => now(), 'updated_at' => now()],
-            ['inventory_object_id' => 1, 'min_quantity' => 3, 'max_quantity' => 5, 'unit_price_cents' => 4050000, 'created_at' => now(), 'updated_at' => now()],
-            ['inventory_object_id' => 1, 'min_quantity' => 6, 'max_quantity' => null, 'unit_price_cents' => 3900000, 'created_at' => now(), 'updated_at' => now()],
+            ['inventory_object_id' => 1, 'min_quantity' => 3, 'max_quantity' => 5, 'unit_price_cents' => 4250000, 'created_at' => now(), 'updated_at' => now()],
+            ['inventory_object_id' => 1, 'min_quantity' => 6, 'max_quantity' => 10, 'unit_price_cents' => 4050000, 'created_at' => now(), 'updated_at' => now()],
+            ['inventory_object_id' => 1, 'min_quantity' => 11, 'max_quantity' => null, 'unit_price_cents' => 3900000, 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }

@@ -245,7 +245,7 @@ class SalesOrderService
         foreach ($items as $item) {
             $quantity = (float) $item['quantity'];
             $subtotal += ((int) $item['list_unit_price_cents'] * $quantity) / 100;
-            $discount += ((int) $item['discount_cents']) / 100;
+            $discount += ((int) $item['discount_cents'] * $quantity) / 100;
             $tax += (float) ($item['tax_amount'] ?? 0);
         }
 
@@ -310,7 +310,11 @@ class SalesOrderService
     {
         foreach ($items as $index => $item) {
             $quantity = (float) $item['quantity'];
-            $listPriceCents = $this->priceResolver->resolve((int) $item['inventory_id'], $saleType, $quantity);
+            try {
+                $listPriceCents = $this->priceResolver->resolve((int) $item['inventory_id'], $saleType, $quantity);
+            } catch (InvalidArgumentException $exception) {
+                $this->invalid("items.$index.quantity", $exception->getMessage());
+            }
             $discountCents = array_key_exists('discount_cents', $item)
                 ? (int) $item['discount_cents']
                 : (int) round(((float) ($item['discount_amount'] ?? 0)) * 100);
