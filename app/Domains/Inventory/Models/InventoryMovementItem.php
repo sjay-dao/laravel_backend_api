@@ -44,4 +44,9 @@ class InventoryMovementItem extends Model
             'inventory_object_unit_id'
         );
     }
+
+    public function lotLink()
+    {
+        return $this->hasOne(InventoryLotMovement::class);
+    }
 }

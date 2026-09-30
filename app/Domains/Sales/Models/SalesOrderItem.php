@@ -44,4 +44,9 @@ class SalesOrderItem extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+
+    public function lotAllocations()
+    {
+        return $this->hasMany(SalesOrderLotAllocation::class);
+    }
 }

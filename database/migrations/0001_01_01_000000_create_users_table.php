@@ -23,10 +23,9 @@ return new class extends Migration
 
                 $table->boolean('is_active')->default(true);
 
-                $table->foreignId('employee_id')
-                    ->nullable()
-                    ->constrained('employees')
-                    ->nullOnDelete();
+                // Employees are created by a later module migration. The relationship
+                // is nullable and cannot be a forward foreign key on a fresh install.
+                $table->unsignedBigInteger('employee_id')->nullable();
 
                 $table->rememberToken();
 

@@ -45,6 +45,8 @@ class PermissionSeeder extends Seeder
 
             ['module' => 'inventory', 'resource' => 'stocks', 'action' => 'view'],
             ['module' => 'inventory', 'resource' => 'stocks', 'action' => 'adjust'],
+            ['module' => 'inventory', 'resource' => 'lots', 'action' => 'view'],
+            ['module' => 'inventory', 'resource' => 'lots', 'action' => 'create'],
 
             // ===========================
             // PAYROLL

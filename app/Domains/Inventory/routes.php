@@ -9,6 +9,7 @@ use App\Domains\Inventory\Controllers\WarehouseController;
 use App\Domains\Inventory\Controllers\InventoryMovementController;
 use App\Domains\Inventory\Controllers\InventoryReservationController;
 use App\Domains\Inventory\Controllers\InventoryStockController;
+use App\Domains\Inventory\Controllers\InventoryLotController;
 
 Route::middleware('auth:sanctum')
 ->prefix('inventory')->group(function () {
@@ -65,6 +66,8 @@ Route::middleware('auth:sanctum')
         'movements',
         InventoryMovementController::class
     );
+
+    Route::post('lots', [InventoryLotController::class, 'store']);
 
     // Route::apiResource(
     //     'reservations',

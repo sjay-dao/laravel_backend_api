@@ -57,6 +57,11 @@ class InventoryObject extends Model
         );
     }
 
+    public function lots()
+    {
+        return $this->hasMany(InventoryLot::class);
+    }
+
     public function evidenceRecords()
     {
         return $this->hasMany(EvidenceRecord::class);
