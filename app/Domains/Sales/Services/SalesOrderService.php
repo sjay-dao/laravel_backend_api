@@ -204,7 +204,15 @@ class SalesOrderService
             }
             $order->update(['status_id' => $this->getStatusId('CLOSED')]);
 
-            return $order->fresh()->load(['customer', 'branch', 'status', 'items.inventory', 'items.unit', 'items.lotAllocations.inventoryLot']);
+            return $order->fresh()->load([
+                'customer',
+                'branch',
+                'status',
+                'items.inventory',
+                'items.unit',
+                'items.lotAllocations.inventoryLot.supplier',
+                'items.lotAllocations.inventoryLot.warehouse',
+            ]);
         }, 3);
     }
 

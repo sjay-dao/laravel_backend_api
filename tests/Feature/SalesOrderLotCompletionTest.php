@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Domains\Inventory\Services\InventoryLotService;
 use App\Domains\Sales\Models\SalesOrder;
+use App\Domains\Sales\Repositories\SalesOrderRepository;
+use App\Domains\Sales\Resources\SalesOrderResource;
 use App\Domains\Sales\Services\SalesOrderService;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -49,6 +51,15 @@ class SalesOrderLotCompletionTest extends InventoryLotFoundationTest
         $this->complete($order, [[$order->items->first()->id, $lot->id, 1]]);
         $this->assertDatabaseHas('inventory_lots', ['id' => $lot->id, 'supplier_id' => 1, 'ownership' => 'CONSIGNMENT', 'quantity_available' => 2]);
         $this->assertDatabaseHas('sales_order_lot_allocations', ['inventory_lot_id' => $lot->id, 'settlement_cost_cents' => 475000]);
+
+        $resource = (new SalesOrderResource(
+            app(SalesOrderRepository::class)->find($order->id)
+        ))->toArray(request());
+        $allocation = $resource['items'][0]['lot_allocations'][0];
+        $this->assertSame('CONSIGNMENT', $allocation['lot']['ownership']);
+        $this->assertSame('Dealer A', $allocation['lot']['supplier']['name']);
+        $this->assertSame('Main stock', $allocation['lot']['warehouse']['name']);
+        $this->assertSame(475000, $allocation['settlement_cost_cents']);
     }
 
     public function test_one_sale_item_can_mix_owned_and_consignment_lots(): void

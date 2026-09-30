@@ -56,6 +56,27 @@ class SalesOrderResource extends JsonResource
                 'tax_amount' => $item->tax_amount,
                 'line_total' => $item->line_total,
                 'remarks' => $item->remarks,
+                'lot_allocations' => $item->relationLoaded('lotAllocations')
+                    ? $item->lotAllocations->map(fn ($allocation) => [
+                        'id' => $allocation->id,
+                        'quantity' => $allocation->quantity,
+                        'settlement_cost_cents' => $allocation->settlement_cost_cents,
+                        'lot' => [
+                            'id' => $allocation->inventoryLot->id,
+                            'ownership' => $allocation->inventoryLot->ownership,
+                            'supplier' => $allocation->inventoryLot->supplier ? [
+                                'id' => $allocation->inventoryLot->supplier->id,
+                                'code' => $allocation->inventoryLot->supplier->code,
+                                'name' => $allocation->inventoryLot->supplier->name,
+                            ] : null,
+                            'warehouse' => $allocation->inventoryLot->warehouse ? [
+                                'id' => $allocation->inventoryLot->warehouse->id,
+                                'code' => $allocation->inventoryLot->warehouse->code,
+                                'name' => $allocation->inventoryLot->warehouse->name,
+                            ] : null,
+                        ],
+                    ])
+                    : [],
             ]),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
