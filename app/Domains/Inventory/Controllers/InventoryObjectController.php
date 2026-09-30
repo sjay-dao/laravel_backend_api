@@ -5,16 +5,34 @@ namespace App\Domains\Inventory\Controllers;
 use App\Domains\Inventory\Models\InventoryObject;
 use App\Domains\Inventory\Requests\StoreInventoryObjectRequest;
 use App\Domains\Inventory\Requests\UpdateInventoryObjectRequest;
+use App\Domains\Inventory\Resources\InventoryLotResource;
 use App\Domains\Inventory\Resources\InventoryObjectResource;
+use App\Domains\Inventory\Resources\InventoryProductSummaryResource;
 use App\Domains\Inventory\Services\InventoryObjectService;
+use App\Domains\Inventory\Services\InventoryReadService;
 use App\Domains\Shared\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 
 class InventoryObjectController extends BaseApiController
 {
     public function __construct(
-        protected InventoryObjectService $service
-    ) {
+        protected InventoryObjectService $service,
+        protected InventoryReadService $readService
+    ) {}
+
+    public function summaries(Request $request)
+    {
+        $this->authorizeAbility($request, 'inventory.products.view');
+        $perPage = min(max((int) $request->integer('per_page', 15), 1), 100);
+
+        return $this->paginated($this->readService->productSummaries($perPage), InventoryProductSummaryResource::class, 'Inventory stock and pricing summaries retrieved successfully.');
+    }
+
+    public function lots(Request $request, InventoryObject $inventoryObject)
+    {
+        $this->authorizeAbility($request, 'inventory.products.view');
+
+        return $this->success(InventoryLotResource::collection($this->readService->productLots($inventoryObject)), 'Inventory lots retrieved successfully.');
     }
 
     public function index(Request $request)
@@ -89,7 +107,7 @@ class InventoryObjectController extends BaseApiController
         );
     }
 
-     public function options(Request $request)
+    public function options(Request $request)
     {
         $this->authorizeAbility(
             $request,
