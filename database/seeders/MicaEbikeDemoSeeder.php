@@ -6,6 +6,7 @@ use App\Domains\Inventory\Services\InventoryLotService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 
 class MicaEbikeDemoSeeder extends Seeder
@@ -35,9 +36,20 @@ class MicaEbikeDemoSeeder extends Seeder
             ]);
             $warehouseId = (int) DB::table('warehouses')->where('code', 'MICA-DEMO-STOCK')->value('id');
 
-            DB::table('units')->updateOrInsert(['code' => 'pc'], [
-                'name' => 'Piece', 'symbol' => 'pc', 'type' => 'count', 'is_active' => true, 'updated_at' => $now, 'created_at' => $now,
-            ]);
+            $unitValues = ['name' => 'Piece', 'symbol' => 'pc', 'updated_at' => $now, 'created_at' => $now];
+            if (Schema::hasColumn('units', 'type')) {
+                $unitValues['type'] = 'count';
+            }
+            if (Schema::hasColumn('units', 'measurement_type')) {
+                $unitValues['measurement_type'] = 'count';
+            }
+            if (Schema::hasColumn('units', 'is_active')) {
+                $unitValues['is_active'] = true;
+            }
+            if (Schema::hasColumn('units', 'is_base')) {
+                $unitValues['is_base'] = true;
+            }
+            DB::table('units')->updateOrInsert(['code' => 'pc'], $unitValues);
             $unitId = (int) DB::table('units')->where('code', 'pc')->value('id');
 
             foreach ([
