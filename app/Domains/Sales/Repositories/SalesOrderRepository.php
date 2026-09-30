@@ -1,9 +1,11 @@
 <?php
+
 namespace App\Domains\Sales\Repositories;
+
 use App\Domains\Sales\Models\SalesOrder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+
 class SalesOrderRepository
 {
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
@@ -27,25 +29,31 @@ class SalesOrderRepository
             ->latest('id')
             ->paginate($perPage);
     }
+
     public function find(int $id): SalesOrder
     {
         return SalesOrder::query()
-            ->with(['customer', 'branch', 'status','items.inventory', 'items.unit'])
+            ->with(['customer', 'branch', 'status', 'items.inventory', 'items.unit'])
             ->findOrFail($id);
     }
+
     public function create(array $data): SalesOrder
     {
         return SalesOrder::create($data);
     }
+
     public function update(SalesOrder $salesOrder, array $data): SalesOrder
     {
         $salesOrder->update($data);
+
         return $salesOrder->refresh();
     }
+
     public function delete(SalesOrder $salesOrder): void
     {
         $salesOrder->delete();
     }
+
     public function generateOrderNumber(): string
     {
         return DB::transaction(function () {
@@ -61,7 +69,8 @@ class SalesOrderRepository
                 $lastSequence = (int) substr($lastOrder->order_no, -6);
                 $sequence = $lastSequence + 1;
             }
-            return $prefix . str_pad((string) $sequence, 6, '0', STR_PAD_LEFT);
+
+            return $prefix.str_pad((string) $sequence, 6, '0', STR_PAD_LEFT);
         });
     }
 }

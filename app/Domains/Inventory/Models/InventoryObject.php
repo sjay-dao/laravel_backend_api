@@ -2,10 +2,10 @@
 
 namespace App\Domains\Inventory\Models;
 
-use App\Domains\Evidence\Models\EvidenceRecord;
 use App\Domains\Evidence\Models\EvidenceReconciliation;
-use Illuminate\Database\Eloquent\Model;
+use App\Domains\Evidence\Models\EvidenceRecord;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class InventoryObject extends Model
 {
@@ -25,12 +25,14 @@ class InventoryObject extends Model
         'track_inventory',
         'is_sellable',
         'is_active',
+        'retail_price_cents',
     ];
 
     protected $casts = [
         'track_inventory' => 'boolean',
-        'is_sellable'     => 'boolean',
-        'is_active'       => 'boolean',
+        'is_sellable' => 'boolean',
+        'is_active' => 'boolean',
+        'retail_price_cents' => 'integer',
     ];
 
     public function category()
@@ -60,6 +62,11 @@ class InventoryObject extends Model
     public function lots()
     {
         return $this->hasMany(InventoryLot::class);
+    }
+
+    public function wholesalePriceTiers()
+    {
+        return $this->hasMany(InventoryWholesalePriceTier::class);
     }
 
     public function evidenceRecords()

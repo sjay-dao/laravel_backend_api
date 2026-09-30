@@ -43,16 +43,11 @@ class UpdateInventoryObjectRequest extends FormRequest
                 'nullable',
                 'string',
             ],
+            'retail_price_cents' => ['sometimes', 'nullable', 'integer', 'min:0'],
+            'wholesale_price_tiers' => ['sometimes', 'array'],
+            'wholesale_price_tiers.*.min_quantity' => ['required', 'numeric', 'gt:0'],
+            'wholesale_price_tiers.*.max_quantity' => ['nullable', 'numeric', 'gt:0'],
+            'wholesale_price_tiers.*.unit_price_cents' => ['required', 'integer', 'min:0'],
         ];
     }
 }
-
-
-
-
-
-
-
-
-
-

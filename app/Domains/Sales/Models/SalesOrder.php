@@ -2,11 +2,10 @@
 
 namespace App\Domains\Sales\Models;
 
-
-use Illuminate\Database\Eloquent\Model;
 use App\Domains\Reference\Models\Customer;
 use App\Domains\Reference\Models\Reference;
 use App\Domains\System\Models\Branch;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -22,6 +21,7 @@ class SalesOrder extends Model
         'order_date',
         'requested_delivery_date',
         'status_id',
+        'sale_type',
         'subtotal',
         'discount_amount',
         'tax_amount',

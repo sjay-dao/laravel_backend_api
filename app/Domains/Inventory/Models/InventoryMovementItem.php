@@ -2,10 +2,8 @@
 
 namespace App\Domains\Inventory\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Domains\Sales\Models\SalesOrderLotAllocation;
 use Illuminate\Database\Eloquent\Model;
-use App\Domains\Inventory\Models\InventoryMovement;
-use App\Domains\Inventory\Models\InventoryObjectUnit;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InventoryMovementItem extends Model
@@ -48,5 +46,10 @@ class InventoryMovementItem extends Model
     public function lotLink()
     {
         return $this->hasOne(InventoryLotMovement::class);
+    }
+
+    public function salesOrderLotAllocation()
+    {
+        return $this->hasOne(SalesOrderLotAllocation::class);
     }
 }

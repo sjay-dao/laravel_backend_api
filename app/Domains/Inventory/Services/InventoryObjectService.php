@@ -6,12 +6,13 @@ use App\Domains\Inventory\Models\InventoryObject;
 use App\Domains\Inventory\Repositories\InventoryObjectRepository;
 use App\Domains\Inventory\Repositories\InventoryObjectUnitRepository;
 use App\Domains\Shared\Services\BaseCrudService;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class InventoryObjectService extends BaseCrudService
 {
     protected InventoryObjectUnitRepository $inventoryObjectUnitRepository;
+
     protected InventoryObjectRepository $inventoryObjectRepository;
 
     public function __construct(
@@ -20,13 +21,15 @@ class InventoryObjectService extends BaseCrudService
         InventoryObjectUnitRepository $inventoryObjectUnitRepository
     ) {
         $this->repository = $repository;
-         $this->inventoryObjectRepository = $inventoryObjectRepository;
+        $this->inventoryObjectRepository = $inventoryObjectRepository;
         $this->inventoryObjectUnitRepository = $inventoryObjectUnitRepository;
     }
 
     public function create(array $data): InventoryObject
     {
         return DB::transaction(function () use ($data) {
+            $tiers = $data['wholesale_price_tiers'] ?? null;
+            unset($data['wholesale_price_tiers']);
 
             $inventoryObject = $this->repository->create($data);
 
@@ -40,6 +43,10 @@ class InventoryObjectService extends BaseCrudService
                 ]
             );
 
+            if ($tiers !== null) {
+                app(InventoryPriceTierService::class)->replace($inventoryObject, $tiers);
+            }
+
             return $this->repository->findById($inventoryObject->id);
         });
     }
@@ -50,6 +57,8 @@ class InventoryObjectService extends BaseCrudService
         $inventoryObject = $model;
 
         return DB::transaction(function () use ($inventoryObject, $data) {
+            $tiers = $data['wholesale_price_tiers'] ?? null;
+            unset($data['wholesale_price_tiers']);
 
             $oldUnitId = $inventoryObject->unit_id;
 
@@ -71,6 +80,10 @@ class InventoryObjectService extends BaseCrudService
                         'conversion_factor' => 1,
                     ]
                 );
+            }
+
+            if ($tiers !== null) {
+                app(InventoryPriceTierService::class)->replace($updated, $tiers);
             }
 
             return $this->repository->findById($updated->id);

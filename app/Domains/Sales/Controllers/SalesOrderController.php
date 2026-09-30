@@ -1,20 +1,23 @@
 <?php
+
 namespace App\Domains\Sales\Controllers;
+
 use App\Domains\Sales\Models\SalesOrder;
 use App\Domains\Sales\Repositories\SalesOrderRepository;
+use App\Domains\Sales\Requests\CompleteSalesOrderRequest;
 use App\Domains\Sales\Requests\StoreSalesOrderRequest;
 use App\Domains\Sales\Requests\UpdateSalesOrderRequest;
 use App\Domains\Sales\Resources\SalesOrderResource;
 use App\Domains\Sales\Services\SalesOrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+
 class SalesOrderController
 {
     public function __construct(
         protected SalesOrderService $service
-    ) {
-    }
-    
+    ) {}
+
     public function index(Request $request)
     {
         $filters = $request->only([
@@ -28,6 +31,7 @@ class SalesOrderController
         $perPage = min((int) $request->input('per_page', 15), 100);
         $orders = app(SalesOrderRepository::class)
             ->paginate($filters, $perPage);
+
         return SalesOrderResource::collection($orders);
     }
 
@@ -37,12 +41,14 @@ class SalesOrderController
             app(SalesOrderRepository::class)->find($id)
         );
     }
+
     public function store(StoreSalesOrderRequest $request): SalesOrderResource
     {
         return new SalesOrderResource(
             $this->service->create($request->validated())
         );
     }
+
     public function update(
         UpdateSalesOrderRequest $request,
         SalesOrder $salesOrder
@@ -54,17 +60,25 @@ class SalesOrderController
             )
         );
     }
+
     public function destroy(SalesOrder $salesOrder): JsonResponse
     {
         $this->service->cancel($salesOrder);
+
         return response()->json([
             'message' => 'Sales order cancelled successfully.',
         ]);
     }
+
     public function confirm(SalesOrder $salesOrder): SalesOrderResource
     {
         return new SalesOrderResource(
             $this->service->confirm($salesOrder)
         );
+    }
+
+    public function complete(CompleteSalesOrderRequest $request, SalesOrder $salesOrder): SalesOrderResource
+    {
+        return new SalesOrderResource($this->service->complete($salesOrder, $request->validated(), (int) $request->user()->id));
     }
 }
