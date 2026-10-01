@@ -10,6 +10,7 @@ $domains = [
     'Reference',
     'Payroll',
     'Evidence',
+    'Finance',
     'Dashboard',
 ];
 

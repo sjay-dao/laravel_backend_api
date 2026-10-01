@@ -49,6 +49,12 @@ class PermissionSeeder extends Seeder
             ['module' => 'inventory', 'resource' => 'lots', 'action' => 'create'],
 
             // ===========================
+            // FINANCE
+            // ===========================
+            ['module' => 'finance', 'resource' => 'expenses', 'action' => 'view'],
+            ['module' => 'finance', 'resource' => 'expenses', 'action' => 'create'],
+
+            // ===========================
             // PAYROLL
             // ===========================
             ['module' => 'payroll', 'resource' => 'payroll', 'action' => 'view'],
@@ -71,7 +77,7 @@ class PermissionSeeder extends Seeder
                 ],
                 [
                     'code' => "{$permission['module']}.{$permission['resource']}.{$permission['action']}",
-                    'description' => ucfirst($permission['action']) . ' ' . ucfirst($permission['resource']),
+                    'description' => ucfirst($permission['action']).' '.ucfirst($permission['resource']),
                     'is_active' => true,
                     'updated_at' => now(),
                     'created_at' => now(),
