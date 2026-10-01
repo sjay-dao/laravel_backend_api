@@ -26,6 +26,7 @@ class InventoryObject extends Model
         'is_sellable',
         'is_active',
         'retail_price_cents',
+        'low_stock_threshold',
     ];
 
     protected $casts = [
@@ -33,6 +34,7 @@ class InventoryObject extends Model
         'is_sellable' => 'boolean',
         'is_active' => 'boolean',
         'retail_price_cents' => 'integer',
+        'low_stock_threshold' => 'decimal:6',
     ];
 
     public function category()

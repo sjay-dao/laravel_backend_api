@@ -33,6 +33,8 @@ class InventoryObjectResource extends JsonResource
 
             'retail_price_cents' => $this->retail_price_cents,
 
+            'low_stock_threshold' => $this->low_stock_threshold,
+
             'wholesale_price_tiers' => $this->whenLoaded('wholesalePriceTiers'),
 
             'category' => new InventoryCategoryResource(

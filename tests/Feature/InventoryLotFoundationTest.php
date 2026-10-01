@@ -16,6 +16,7 @@ class InventoryLotFoundationTest extends TestCase
         parent::setUp();
         $this->createFoundationTables();
         (require database_path('migrations/2026_09_30_000000_add_inventory_ownership_lot_foundation.php'))->up();
+        (require database_path('migrations/2026_10_01_010000_add_low_stock_threshold_to_inventory_objects.php'))->up();
 
         $now = now();
         DB::table('users')->insert(['id' => 1, 'name' => 'Stock Clerk', 'email' => 'stock@example.test', 'created_at' => $now, 'updated_at' => $now]);

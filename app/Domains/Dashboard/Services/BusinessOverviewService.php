@@ -14,6 +14,7 @@ class BusinessOverviewService
         $payments = DB::table('sales_order_payments')->selectRaw('sales_order_id, SUM(applied_amount_cents) as paid_cents')->groupBy('sales_order_id');
         $openBalances = DB::table('sales_orders as so')->leftJoinSub($payments, 'p', 'p.sales_order_id', '=', 'so.id')
             ->whereNull('so.deleted_at')->where('so.status_id', $confirmedId);
+        $lotAvailability = DB::table('inventory_lots')->selectRaw('inventory_object_id, SUM(quantity_available) as available_quantity')->groupBy('inventory_object_id');
 
         return [
             'sales' => [
@@ -29,6 +30,10 @@ class BusinessOverviewService
                 'available_quantity' => (float) DB::table('inventory_lots')->sum('quantity_available'),
                 'owned_quantity' => (float) DB::table('inventory_lots')->where('ownership', 'OWNED')->sum('quantity_available'),
                 'consignment_quantity' => (float) DB::table('inventory_lots')->where('ownership', 'CONSIGNMENT')->sum('quantity_available'),
+                'low_stock_product_count' => (int) DB::table('inventory_objects as io')
+                    ->leftJoinSub($lotAvailability, 'stock', 'stock.inventory_object_id', '=', 'io.id')
+                    ->where('io.is_active', true)->whereNotNull('io.low_stock_threshold')
+                    ->whereRaw('COALESCE(stock.available_quantity, 0) <= io.low_stock_threshold')->count(),
             ],
             'generated_at' => now()->toISOString(),
         ];

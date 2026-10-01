@@ -44,6 +44,7 @@ class UpdateInventoryObjectRequest extends FormRequest
                 'string',
             ],
             'retail_price_cents' => ['sometimes', 'nullable', 'integer', 'min:0'],
+            'low_stock_threshold' => ['sometimes', 'nullable', 'numeric', 'min:0'],
             'wholesale_price_tiers' => ['sometimes', 'array'],
             'wholesale_price_tiers.*.min_quantity' => ['required', 'numeric', 'gt:0'],
             'wholesale_price_tiers.*.max_quantity' => ['nullable', 'numeric', 'gt:0'],

@@ -73,6 +73,7 @@ class StoreInventoryObjectRequest extends FormRequest
                 'boolean',
             ],
             'retail_price_cents' => ['nullable', 'integer', 'min:0'],
+            'low_stock_threshold' => ['nullable', 'numeric', 'min:0'],
             'wholesale_price_tiers' => ['nullable', 'array'],
             'wholesale_price_tiers.*.min_quantity' => ['required', 'numeric', 'gt:0'],
             'wholesale_price_tiers.*.max_quantity' => ['nullable', 'numeric', 'gt:0'],
