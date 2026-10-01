@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SalesOrderLotAllocation extends Model
 {
-    protected $fillable = ['sales_order_item_id', 'inventory_lot_id', 'inventory_movement_item_id', 'quantity', 'settlement_cost_cents'];
+    protected $fillable = ['sales_order_item_id', 'inventory_lot_id', 'inventory_movement_item_id', 'quantity', 'ownership_snapshot', 'settlement_cost_cents'];
 
     protected $casts = ['quantity' => 'decimal:6', 'settlement_cost_cents' => 'integer'];
 

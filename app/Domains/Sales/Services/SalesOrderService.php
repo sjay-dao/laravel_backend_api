@@ -200,7 +200,8 @@ class SalesOrderService
                 ]);
                 DB::table('sales_order_lot_allocations')->insert([
                     'sales_order_item_id' => $item->id, 'inventory_lot_id' => $lot->id, 'inventory_movement_item_id' => $movementItemId,
-                    'quantity' => $quantity, 'settlement_cost_cents' => $lot->settlement_cost_cents, 'created_at' => now(), 'updated_at' => now(),
+                    'quantity' => $quantity, 'ownership_snapshot' => $lot->ownership,
+                    'settlement_cost_cents' => $lot->settlement_cost_cents, 'created_at' => now(), 'updated_at' => now(),
                 ]);
             }
             foreach ($lotTotals as $lotId => $quantity) {

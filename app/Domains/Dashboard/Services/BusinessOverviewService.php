@@ -2,10 +2,13 @@
 
 namespace App\Domains\Dashboard\Services;
 
+use App\Domains\Sales\Services\SalesProfitabilityService;
 use Illuminate\Support\Facades\DB;
 
 class BusinessOverviewService
 {
+    public function __construct(private SalesProfitabilityService $profitability) {}
+
     public function get(): array
     {
         $today = now()->toDateString();
@@ -19,27 +22,21 @@ class BusinessOverviewService
             ->whereNull('so.deleted_at')->where('so.status_id', $confirmedId);
         $lotAvailability = DB::table('inventory_lots')->selectRaw('inventory_object_id, SUM(quantity_available) as available_quantity')->groupBy('inventory_object_id');
 
-        $todaySalesCents = (int) round(((float) (clone $closed)->whereDate('order_date', $today)->sum('total_amount')) * 100);
-        $monthSalesCents = (int) round(((float) (clone $closed)->whereBetween('order_date', [$monthStart, $monthEnd])->sum('total_amount')) * 100);
         $todayExpensesCents = (int) DB::table('expenses')->whereDate('expense_date', $today)->sum('amount_cents');
         $monthExpensesCents = (int) DB::table('expenses')->whereBetween('expense_date', [$monthStart, $monthEnd])->sum('amount_cents');
 
         return [
             'sales' => [
-                'today_cents' => $todaySalesCents,
-                'month_cents' => $monthSalesCents,
+                'today_cents' => (int) round(((float) (clone $closed)->whereDate('order_date', $today)->sum('total_amount')) * 100),
+                'month_cents' => (int) round(((float) (clone $closed)->whereBetween('order_date', [$monthStart, $monthEnd])->sum('total_amount')) * 100),
                 'order_count' => (int) DB::table('sales_orders')->whereNull('deleted_at')->count(),
                 'closed_count' => (int) (clone $closed)->count(),
                 'unpaid_count' => (int) (clone $openBalances)->whereRaw('COALESCE(p.paid_cents, 0) = 0')->count(),
                 'partially_paid_count' => (int) (clone $openBalances)->whereRaw('COALESCE(p.paid_cents, 0) > 0 AND COALESCE(p.paid_cents, 0) < ROUND(so.total_amount * 100)')->count(),
             ],
-            'expenses' => [
-                'today_cents' => $todayExpensesCents,
-                'month_cents' => $monthExpensesCents,
-            ],
-            'cash_flow' => [
-                'today_sales_less_recorded_expenses_cents' => $todaySalesCents - $todayExpensesCents,
-                'month_sales_less_recorded_expenses_cents' => $monthSalesCents - $monthExpensesCents,
+            'profitability' => [
+                'today' => $this->profitability->forPeriod($today, $today, $todayExpensesCents),
+                'month' => $this->profitability->forPeriod($monthStart, $monthEnd, $monthExpensesCents),
             ],
             'inventory' => [
                 'product_count' => (int) DB::table('inventory_objects')->where('is_active', true)->count(),

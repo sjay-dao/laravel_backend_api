@@ -2,6 +2,7 @@
 
 namespace App\Domains\Sales\Resources;
 
+use App\Domains\Sales\Services\SalesProfitabilityService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -39,6 +40,7 @@ class SalesOrderResource extends JsonResource
             'discount_amount' => $this->discount_amount,
             'tax_amount' => $this->tax_amount,
             'total_amount' => $this->total_amount,
+            'profitability' => app(SalesProfitabilityService::class)->forOrder($this->resource),
             'remarks' => $this->remarks,
             'payment_summary' => [
                 'status' => $paidCents === 0 ? 'UNPAID' : ($balanceCents > 0 ? 'PARTIALLY_PAID' : 'PAID'),
@@ -81,6 +83,9 @@ class SalesOrderResource extends JsonResource
                     ? $item->lotAllocations->map(fn ($allocation) => [
                         'id' => $allocation->id,
                         'quantity' => $allocation->quantity,
+                        'ownership' => $allocation->ownership_snapshot,
+                        'unit_cost_basis_cents' => $allocation->settlement_cost_cents,
+                        'total_cost_basis_cents' => (int) round(((float) $allocation->quantity) * $allocation->settlement_cost_cents),
                         'settlement_cost_cents' => $allocation->settlement_cost_cents,
                         'lot' => [
                             'id' => $allocation->inventoryLot->id,
