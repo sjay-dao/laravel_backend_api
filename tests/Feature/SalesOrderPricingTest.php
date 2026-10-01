@@ -3,8 +3,11 @@
 namespace Tests\Feature;
 
 use App\Domains\Sales\Models\SalesOrder;
+use App\Domains\Sales\Requests\StoreSalesOrderRequest;
+use App\Domains\Sales\Requests\UpdateSalesOrderRequest;
 use App\Domains\Sales\Resources\SalesOrderResource;
 use App\Domains\Sales\Services\SalesOrderService;
+use App\Domains\System\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
@@ -15,6 +18,7 @@ class SalesOrderPricingTest extends SalesOrderLotCompletionTest
     {
         parent::setUp();
         (require database_path('migrations/2026_09_30_020000_add_sales_pricing_foundation.php'))->up();
+        (require database_path('migrations/2026_10_01_040000_add_sale_type_to_sales_order_items.php'))->up();
         DB::table('inventory_objects')->where('id', 1)->update(['retail_price_cents' => 4500000]);
     }
 
@@ -84,6 +88,73 @@ class SalesOrderPricingTest extends SalesOrderLotCompletionTest
         } catch (InvalidArgumentException) {
         }
         $this->assertSame(4500000, (int) DB::table('sales_order_items')->where('sales_order_id', $order->id)->value('final_unit_price_cents'));
+    }
+
+    public function test_mixed_lines_use_existing_resolver_and_preserve_historical_modes_and_prices(): void
+    {
+        $this->tiers();
+        $data = $this->payload('RETAIL', 1, 200000);
+        $data['items'][0]['sale_type'] = 'RETAIL';
+        $data['items'][] = ['inventory_id' => 1, 'unit_id' => 1, 'quantity' => 3, 'sale_type' => 'WHOLESALE', 'discount_cents' => 0];
+        $order = app(SalesOrderService::class)->create($data);
+        $this->assertSame('170500.00', $order->total_amount);
+        $this->assertSame(['RETAIL', 'WHOLESALE'], $order->items->pluck('sale_type')->all());
+        $this->assertSame([4300000, 4250000], $order->items->pluck('final_unit_price_cents')->all());
+        DB::table('inventory_objects')->where('id', 1)->update(['retail_price_cents' => 9999999]);
+        DB::table('inventory_wholesale_price_tiers')->update(['unit_price_cents' => 1]);
+        $saved = $order->fresh(['items.inventory', 'items.unit', 'customer', 'branch', 'status', 'payments']);
+        $resource = (new SalesOrderResource($saved))->toArray(request());
+        $this->assertSame('WHOLESALE', $resource['items'][1]['sale_type']);
+        $this->assertSame(12750000, $resource['items'][1]['line_total_cents']);
+        $this->assertSame(4300000, $resource['items'][0]['final_unit_price_cents']);
+    }
+
+    public function test_line_modes_inherit_default_and_validate_without_partial_writes(): void
+    {
+        $this->tiers();
+        $order = $this->createPricedOrder('WHOLESALE', 3);
+        $this->assertSame('WHOLESALE', $order->items->first()->sale_type);
+        $data = $this->payload('RETAIL', 6);
+        $data['items'][0]['sale_type'] = 'WHOLESALE';
+        $updated = app(SalesOrderService::class)->update($order, $data);
+        $this->assertSame(4050000, $updated->items->first()->list_unit_price_cents);
+        $this->assertSame('WHOLESALE', $updated->items->first()->sale_type);
+        $data['items'][0]['sale_type'] = 'INVALID';
+        try {
+            app(SalesOrderService::class)->update($updated, $data);
+            $this->fail('Invalid line mode must fail.');
+        } catch (ValidationException $error) {
+            $this->assertArrayHasKey('items.0.sale_type', $error->errors());
+        }
+        $this->assertSame(4050000, $updated->fresh()->items->first()->list_unit_price_cents);
+    }
+
+    public function test_legacy_null_line_modes_resolve_to_saved_order_default_without_repricing(): void
+    {
+        $order = $this->createPricedOrder('RETAIL', 1);
+        DB::table('sales_order_items')->where('sales_order_id', $order->id)->update(['sale_type' => null]);
+        $resource = (new SalesOrderResource($order->fresh(['items.inventory', 'items.unit'])))->toArray(request());
+        $this->assertSame('RETAIL', $resource['items'][0]['sale_type']);
+        $this->assertSame(4500000, $resource['items'][0]['list_unit_price_cents']);
+    }
+
+    public function test_sale_write_requests_require_existing_create_or_update_permission(): void
+    {
+        foreach ([
+            StoreSalesOrderRequest::class => 'sales.sales.create',
+            UpdateSalesOrderRequest::class => 'sales.sales.update',
+        ] as $class => $ability) {
+            foreach ([false, true] as $allowed) {
+                $user = \Mockery::mock(User::class);
+                $user->shouldReceive('can')->once()->with($ability)->andReturn($allowed);
+                $request = new $class;
+                $request->setUserResolver(fn () => $user);
+                $this->assertSame($allowed, $request->authorize());
+            }
+            $request = new $class;
+            $request->setUserResolver(fn () => null);
+            $this->assertFalse($request->authorize());
+        }
     }
 
     private function createPricedOrder(string $saleType, int $quantity, int $discountCents = 0): SalesOrder

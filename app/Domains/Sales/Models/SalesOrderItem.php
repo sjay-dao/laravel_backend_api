@@ -14,6 +14,7 @@ class SalesOrderItem extends Model
         'inventory_id',
         'unit_id',
         'quantity',
+        'sale_type',
         'list_unit_price_cents',
         'discount_cents',
         'final_unit_price_cents',

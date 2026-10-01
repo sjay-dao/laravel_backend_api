@@ -70,6 +70,7 @@ class SalesOrderResource extends JsonResource
                     'name' => $item->unit->name,
                 ],
                 'quantity' => $item->quantity,
+                'sale_type' => $item->sale_type ?? $this->sale_type,
                 'list_unit_price_cents' => $item->list_unit_price_cents,
                 'discount_cents' => $item->discount_cents,
                 'final_unit_price_cents' => $item->final_unit_price_cents,

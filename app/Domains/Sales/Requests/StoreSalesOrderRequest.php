@@ -9,7 +9,7 @@ class StoreSalesOrderRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return (bool) $this->user()?->can('sales.sales.create');
     }
 
     public function rules(): array
@@ -24,6 +24,7 @@ class StoreSalesOrderRequest extends FormRequest
             'items' => ['required', 'array', 'min:1'],
             'items.*.inventory_id' => ['required', 'integer', 'exists:inventory_objects,id'],
             'items.*.unit_id' => ['required', 'integer', 'exists:units,id'],
+            'items.*.sale_type' => ['nullable', Rule::in(['RETAIL', 'WHOLESALE'])],
             'items.*.quantity' => ['required', 'numeric', 'gt:0'],
             'items.*.unit_price' => ['nullable', 'numeric', 'gte:0'],
             'items.*.discount_amount' => ['nullable', 'numeric', 'gte:0'],

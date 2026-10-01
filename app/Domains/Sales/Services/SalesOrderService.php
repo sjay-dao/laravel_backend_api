@@ -241,6 +241,7 @@ class SalesOrderService
                 'inventory_id' => $item['inventory_id'],
                 'unit_id' => $item['unit_id'],
                 'quantity' => $quantity,
+                'sale_type' => $item['sale_type'],
                 'list_unit_price_cents' => $unitPriceCents,
                 'discount_cents' => $discountCents,
                 'final_unit_price_cents' => $finalUnitPriceCents,
@@ -328,7 +329,11 @@ class SalesOrderService
         foreach ($items as $index => $item) {
             $quantity = (float) $item['quantity'];
             try {
-                $listPriceCents = $this->priceResolver->resolve((int) $item['inventory_id'], $saleType, $quantity);
+                $lineType = strtoupper($item['sale_type'] ?? $saleType);
+                if (! in_array($lineType, ['RETAIL', 'WHOLESALE'], true)) {
+                    $this->invalid("items.$index.sale_type", 'Choose RETAIL or WHOLESALE for the line.');
+                }
+                $listPriceCents = $this->priceResolver->resolve((int) $item['inventory_id'], $lineType, $quantity);
             } catch (InvalidArgumentException $exception) {
                 $this->invalid("items.$index.quantity", $exception->getMessage());
             }
@@ -340,6 +345,7 @@ class SalesOrderService
             }
             $finalUnitPriceCents = $listPriceCents - $discountCents;
             $items[$index] = [...$item,
+                'sale_type' => $lineType,
                 'list_unit_price_cents' => $listPriceCents,
                 'discount_cents' => $discountCents,
                 'final_unit_price_cents' => $finalUnitPriceCents,
