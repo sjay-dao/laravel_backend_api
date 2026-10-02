@@ -11,7 +11,7 @@ return new class extends Migration
         // Structure only: no geography or personal data is imported from dumps.
         if (! Schema::hasTable('psgc_region')) {
             Schema::create('psgc_region', function (Blueprint $table) {
-                $table->increments('id');
+                $table->integer('id', true); // Existing geography links use signed INT IDs.
                 $table->string('code')->unique();
                 $table->string('prefix')->nullable();
                 $table->string('description');
@@ -21,7 +21,7 @@ return new class extends Migration
         }
         if (! Schema::hasTable('psgc_province')) {
             Schema::create('psgc_province', function (Blueprint $table) {
-                $table->increments('id');
+                $table->integer('id', true); // Existing geography links use signed INT IDs.
                 $table->string('code')->unique();
                 $table->string('prefix');
                 $table->string('description');
@@ -32,7 +32,7 @@ return new class extends Migration
         }
         if (! Schema::hasTable('psgc_city_mun')) {
             Schema::create('psgc_city_mun', function (Blueprint $table) {
-                $table->increments('id');
+                $table->integer('id', true); // Existing geography links use signed INT IDs.
                 $table->string('code')->unique();
                 $table->string('prefix');
                 $table->string('description');
@@ -45,7 +45,7 @@ return new class extends Migration
         }
         if (! Schema::hasTable('psgc_barangay')) {
             Schema::create('psgc_barangay', function (Blueprint $table) {
-                $table->increments('id');
+                $table->integer('id', true); // Existing geography links use signed INT IDs.
                 $table->string('code')->unique();
                 $table->string('description');
                 $table->string('region_prefix');

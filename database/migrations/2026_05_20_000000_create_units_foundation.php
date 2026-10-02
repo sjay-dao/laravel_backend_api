@@ -15,8 +15,8 @@ return new class extends Migration
                 $table->string('code', 20)->unique();
                 $table->string('name', 100);
                 $table->string('symbol', 20);
-                $table->string('type', 30);
-                $table->boolean('is_active')->default(true);
+                $table->enum('measurement_type', ['count', 'weight', 'volume', 'length', 'area', 'time']);
+                $table->boolean('is_base')->default(false);
                 $table->timestamps();
             });
         }

@@ -20,7 +20,7 @@ return new class extends Migration
         if (! Schema::hasTable('inventory_objects')) {
             Schema::create('inventory_objects', function (Blueprint $t) {
                 $t->id();
-                $t->string('code')->unique();
+                $t->string('code', 50)->nullable()->unique();
                 $t->string('name');
                 $t->foreignId('inventory_category_id')->nullable()->constrained('inventory_categories')->restrictOnDelete();
                 $t->foreignId('unit_id')->constrained('units')->restrictOnDelete();
@@ -32,7 +32,13 @@ return new class extends Migration
         }
         foreach (['brand', 'variant', 'packaging_description', 'specification'] as $column) {
             if (! Schema::hasColumn('inventory_objects', $column)) {
-                Schema::table('inventory_objects', fn (Blueprint $t) => $t->string($column)->nullable());
+                Schema::table('inventory_objects', function (Blueprint $t) use ($column) {
+                    if ($column === 'specification') {
+                        $t->text($column)->nullable();
+                    } else {
+                        $t->string($column, $column === 'brand' ? 100 : 150)->nullable();
+                    }
+                });
             }
         }
         if (! Schema::hasTable('warehouses')) {

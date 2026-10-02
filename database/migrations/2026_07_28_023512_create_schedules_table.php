@@ -22,7 +22,7 @@ return new class extends Migration
                 'FLEXIBLE',
                 'ON_CALL',
                 'SHIFT',
-                'FIELD'
+                'FIELD',
             ]);
 
             $table->unsignedSmallInteger('weekly_required_minutes')->default(0);
@@ -56,6 +56,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('schedule_type');
+        Schema::dropIfExists('schedules');
     }
 };

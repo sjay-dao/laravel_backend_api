@@ -46,8 +46,7 @@ return new class extends Migration
             $table->foreignId('department_id')->nullable()->constrained('employee_departments')->nullOnDelete();
             $table->foreignId('position_id')->nullable()->constrained('employee_positions')->nullOnDelete();
             $table->foreignId('employment_status_id')
-            ->nullable()
-            ->constrained('lookups');
+                ->nullable(); // Added after lookup tables exist.
             $table->date('hire_date')->nullable()->index();
             $table->date('regularization_date')->nullable();
             $table->date('separation_date')->nullable();

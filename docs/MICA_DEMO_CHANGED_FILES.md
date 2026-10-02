@@ -1,0 +1,51 @@
+# Mica demo changed files
+
+All changes belong to the guarded fresh-demo installation milestone.
+The SQL artifact is moved, not replaced by a live database dump.
+
+- `.env.example`
+- `app/Console/Commands/DemoReset.php`
+- `app/Domains/Sales/routes.php`
+- `app/Support/DemoDatabaseGuard.php`
+- `config/demo.php`
+- `database/migrations/2026_05_20_000000_create_units_foundation.php`
+- `database/migrations/2026_05_22_044121_create_products_table.php`
+- `database/migrations/2026_05_26_005707_create_orders_table.php`
+- `database/migrations/2026_06_23_000000_create_missing_geography_foundation.php`
+- `database/migrations/2026_06_25_100000_add_deferred_legacy_order_foreign_keys.php`
+- `database/migrations/2026_07_01_000000_create_missing_inventory_foundation.php`
+- `database/migrations/2026_07_27_000000_create_employee_module_tables.php`
+- `database/migrations/2026_07_28_023512_create_schedules_table.php`
+- `database/migrations/2026_07_28_060000_add_deferred_employee_lookup_foreign_key.php`
+- `database/migrations/2026_08_18_120000_create_missing_goods_receipt_foundation.php`
+- `database/migrations/2026_09_30_000000_add_inventory_ownership_lot_foundation.php`
+- `database/migrations/2026_09_30_020000_add_sales_pricing_foundation.php`
+- `database/migrations/2026_10_02_000000_add_role_active_flag.php`
+- `database/migrations/2026_10_02_010000_align_unit_api_columns.php`
+- `database/migrations/_2026_07_02_054033_create_units_table.php`
+- `database/schema/mysql-schema.sql`
+- `database/seeders/DatabaseSeeder.php`
+- `database/seeders/DemoAccessSeeder.php`
+- `database/seeders/LookupSeeder.php`
+- `database/seeders/MicaDemoDatabaseSeeder.php`
+- `database/seeders/MicaDemoTransactionsSeeder.php`
+- `database/seeders/MicaEbikeDemoSeeder.php`
+- `database/seeders/PermissionSeeder.php`
+- `database/seeders/ReferenceDatabaseSeeder.php`
+- `database/seeders/RolePermissionSeeder.php`
+- `database/seeders/RoleSeeder.php`
+- `database/seeders/UnitSeeder.php`
+- `database/seeders/UserRoleSeeder.php`
+- `database/seeders/UserSeeder.php`
+- `docs/MICA_DEMO_CHANGED_FILES.md`
+- `docs/MICA_DEMO_DATABASE_SETUP.md`
+- `docs/MICA_DEMO_PERMISSION_CATALOG.md`
+- `docs/legacy-schema/README.md`
+- `docs/legacy-schema/mysql-schema.sql`
+- `phpunit.xml`
+- `routes/api.php`
+- `routes/console.php`
+- `tests/Feature/DemoDatabaseGuardTest.php`
+- `tests/Feature/LegacyUnitApiMigrationTest.php`
+- `tests/Feature/MicaDemoDatabaseReadinessTest.php`
+- `tests/Feature/MicaEbikeDemoInventoryTest.php`

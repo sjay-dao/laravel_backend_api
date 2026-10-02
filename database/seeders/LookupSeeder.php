@@ -10,26 +10,16 @@ class LookupSeeder extends Seeder
     public function run(): void
     {
         $this->attendanceStatuses();
-
         $this->employmentStatuses();
-
         $this->contractTypes();
-
         $this->scheduleTypes();
-
         $this->payrollFrequencies();
-        
-        $this->attendanceStatuses();
-
-        $this->employmentStatuses();
-
-        $this->contractTypes();
-
-        $this->scheduleTypes();
-
-        $this->payrollFrequencies();
-
         $this->jobTypes();
+        $this->attendanceSources();
+        $this->attendanceStates();
+        $this->overtimeTypes();
+        $this->paymentMethods();
+        $this->dayTypes();
     }
 
     protected function typeId(string $code): int
@@ -84,20 +74,20 @@ class LookupSeeder extends Seeder
                     'sort_order' => 1,
                     'metadata' => json_encode([
                         'payable' => true,
-                        'counts_as_workday' => true
-                    ])
+                        'counts_as_workday' => true,
+                    ]),
                 ],
 
                 [
-                    'code' => 'HALFDAY',
+                    'code' => 'HALF_DAY',
                     'name' => 'Half Day',
                     'value' => 0.5,
                     'color' => '#FACC15',
                     'sort_order' => 2,
                     'metadata' => json_encode([
                         'payable' => true,
-                        'counts_as_workday' => true
-                    ])
+                        'counts_as_workday' => true,
+                    ]),
                 ],
 
                 [
@@ -108,8 +98,8 @@ class LookupSeeder extends Seeder
                     'sort_order' => 3,
                     'metadata' => json_encode([
                         'payable' => false,
-                        'counts_as_workday' => false
-                    ])
+                        'counts_as_workday' => false,
+                    ]),
                 ],
 
                 [
@@ -117,7 +107,7 @@ class LookupSeeder extends Seeder
                     'name' => 'Leave',
                     'value' => 1,
                     'color' => '#3B82F6',
-                    'sort_order' => 4
+                    'sort_order' => 4,
                 ],
 
                 [
@@ -125,16 +115,16 @@ class LookupSeeder extends Seeder
                     'name' => 'Holiday',
                     'value' => 1,
                     'color' => '#A855F7',
-                    'sort_order' => 5
+                    'sort_order' => 5,
                 ],
 
                 [
-                    'code' => 'RESTDAY',
+                    'code' => 'REST_DAY',
                     'name' => 'Rest Day',
                     'value' => 0,
                     'color' => '#9CA3AF',
-                    'sort_order' => 6
-                ]
+                    'sort_order' => 6,
+                ],
 
             ]
         );
@@ -146,11 +136,11 @@ class LookupSeeder extends Seeder
             $this->typeId('EMPLOYMENT_STATUS'),
             [
 
-                ['code'=>'PROBATIONARY','name'=>'Probationary'],
-                ['code'=>'REGULAR','name'=>'Regular'],
-                ['code'=>'CONTRACTUAL','name'=>'Contractual'],
-                ['code'=>'PROJECT','name'=>'Project Based'],
-                ['code'=>'ONCALL','name'=>'On Call'],
+                ['code' => 'PROBATIONARY', 'name' => 'Probationary'],
+                ['code' => 'REGULAR', 'name' => 'Regular'],
+                ['code' => 'CONTRACTUAL', 'name' => 'Contractual'],
+                ['code' => 'PROJECT', 'name' => 'Project Based'],
+                ['code' => 'ONCALL', 'name' => 'On Call'],
 
             ]
         );
@@ -162,10 +152,10 @@ class LookupSeeder extends Seeder
             $this->typeId('CONTRACT_TYPE'),
             [
 
-                ['code'=>'MONTHLY','name'=>'Monthly'],
-                ['code'=>'DAILY','name'=>'Daily'],
-                ['code'=>'HOURLY','name'=>'Hourly'],
-                ['code'=>'PIECE_RATE','name'=>'Piece Rate'],
+                ['code' => 'MONTHLY', 'name' => 'Monthly'],
+                ['code' => 'DAILY', 'name' => 'Daily'],
+                ['code' => 'HOURLY', 'name' => 'Hourly'],
+                ['code' => 'PIECE_RATE', 'name' => 'Piece Rate'],
 
             ]
         );
@@ -177,8 +167,8 @@ class LookupSeeder extends Seeder
             $this->typeId('SCHEDULE_TYPE'),
             [
 
-                ['code'=>'FIXED','name'=>'Fixed'],
-                ['code'=>'FLEXIBLE','name'=>'Flexible'],
+                ['code' => 'FIXED', 'name' => 'Fixed'],
+                ['code' => 'FLEXIBLE', 'name' => 'Flexible'],
 
             ]
         );
@@ -190,14 +180,14 @@ class LookupSeeder extends Seeder
             $this->typeId('PAYROLL_FREQUENCY'),
             [
 
-                ['code'=>'WEEKLY','name'=>'Weekly'],
-                ['code'=>'SEMI_MONTHLY','name'=>'Semi Monthly'],
-                ['code'=>'MONTHLY','name'=>'Monthly'],
+                ['code' => 'WEEKLY', 'name' => 'Weekly'],
+                ['code' => 'SEMI_MONTHLY', 'name' => 'Semi Monthly'],
+                ['code' => 'MONTHLY', 'name' => 'Monthly'],
 
             ]
         );
     }
-    
+
     protected function attendanceSources(): void
     {
         $this->insert(
@@ -244,11 +234,11 @@ class LookupSeeder extends Seeder
             $this->typeId('ATTENDANCE_STATE'),
             [
 
-                ['code'=>'PENDING','name'=>'Pending'],
+                ['code' => 'PENDING', 'name' => 'Pending'],
 
-                ['code'=>'APPROVED','name'=>'Approved'],
+                ['code' => 'APPROVED', 'name' => 'Approved'],
 
-                ['code'=>'REJECTED','name'=>'Rejected'],
+                ['code' => 'REJECTED', 'name' => 'Rejected'],
 
             ]
         );
@@ -260,15 +250,15 @@ class LookupSeeder extends Seeder
             $this->typeId('OVERTIME_TYPE'),
             [
 
-                ['code'=>'REGULAR','name'=>'Regular OT'],
+                ['code' => 'REGULAR', 'name' => 'Regular OT'],
 
-                ['code'=>'RESTDAY','name'=>'Rest Day OT'],
+                ['code' => 'RESTDAY', 'name' => 'Rest Day OT'],
 
-                ['code'=>'HOLIDAY','name'=>'Holiday OT'],
+                ['code' => 'HOLIDAY', 'name' => 'Holiday OT'],
 
-                ['code'=>'SPECIAL_HOLIDAY','name'=>'Special Holiday OT'],
+                ['code' => 'SPECIAL_HOLIDAY', 'name' => 'Special Holiday OT'],
 
-                ['code'=>'NIGHT_DIFF','name'=>'Night Differential'],
+                ['code' => 'NIGHT_DIFF', 'name' => 'Night Differential'],
 
             ]
         );
@@ -280,13 +270,13 @@ class LookupSeeder extends Seeder
             $this->typeId('PAYMENT_METHOD'),
             [
 
-                ['code'=>'BANK','name'=>'Bank Transfer'],
+                ['code' => 'BANK', 'name' => 'Bank Transfer'],
 
-                ['code'=>'GCASH','name'=>'GCash'],
+                ['code' => 'GCASH', 'name' => 'GCash'],
 
-                ['code'=>'CASH','name'=>'Cash'],
+                ['code' => 'CASH', 'name' => 'Cash'],
 
-                ['code'=>'CHECK','name'=>'Check'],
+                ['code' => 'CHECK', 'name' => 'Check'],
 
             ]
         );
@@ -299,23 +289,23 @@ class LookupSeeder extends Seeder
             [
 
                 [
-                    'code'=>'WORKDAY',
-                    'name'=>'Work Day'
+                    'code' => 'WORKDAY',
+                    'name' => 'Work Day',
                 ],
 
                 [
-                    'code'=>'RESTDAY',
-                    'name'=>'Rest Day'
+                    'code' => 'RESTDAY',
+                    'name' => 'Rest Day',
                 ],
 
                 [
-                    'code'=>'HOLIDAY',
-                    'name'=>'Holiday'
+                    'code' => 'HOLIDAY',
+                    'name' => 'Holiday',
                 ],
 
                 [
-                    'code'=>'SPECIAL_HOLIDAY',
-                    'name'=>'Special Holiday'
+                    'code' => 'SPECIAL_HOLIDAY',
+                    'name' => 'Special Holiday',
                 ],
 
             ]

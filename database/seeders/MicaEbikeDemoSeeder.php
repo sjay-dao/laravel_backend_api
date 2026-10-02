@@ -3,27 +3,26 @@
 namespace Database\Seeders;
 
 use App\Domains\Inventory\Services\InventoryLotService;
+use App\Support\DemoDatabaseGuard;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
-use RuntimeException;
 
 class MicaEbikeDemoSeeder extends Seeder
 {
     public function run(): void
     {
-        if (app()->environment('production')) {
-            throw new RuntimeException('Mica demo data cannot be seeded in production.');
-        }
+        app(DemoDatabaseGuard::class)->assertSafe();
 
         DB::transaction(function () {
             $now = now();
-            DB::table('users')->updateOrInsert(['email' => 'mica.demo@example.test'], [
-                'name' => 'Mica Demo Administrator', 'password' => Hash::make('demo-password'), 'is_active' => true,
+            DB::table('users')->updateOrInsert(['email' => 'admin@mica.demo'], [
+                'name' => 'Mica Demo Administrator', 'password' => Hash::make(config('demo.password')), 'is_active' => true,
                 'updated_at' => $now, 'created_at' => $now,
             ]);
-            $actorId = (int) DB::table('users')->where('email', 'mica.demo@example.test')->value('id');
+            $actorId = (int) DB::table('users')->where('email', 'admin@mica.demo')->value('id');
 
             DB::table('branches')->updateOrInsert(['code' => 'MICA-DEMO'], [
                 'name' => 'Mica E-Bike Demo Branch', 'address' => 'FICTIONAL DEMO LOCATION', 'branch_type' => 'MAIN',
@@ -101,9 +100,8 @@ class MicaEbikeDemoSeeder extends Seeder
                 );
             }
 
-            DB::table('inventory_wholesale_price_tiers')->where('inventory_object_id', $productIds['DEMO-EB-URBAN-X2'])->delete();
             foreach ([[3, 5, 4250000], [6, 10, 4050000], [11, null, 3900000]] as [$min, $max, $price]) {
-                DB::table('inventory_wholesale_price_tiers')->insert([
+                DB::table('inventory_wholesale_price_tiers')->updateOrInsert(['inventory_object_id' => $productIds['DEMO-EB-URBAN-X2'], 'min_quantity' => $min], [
                     'inventory_object_id' => $productIds['DEMO-EB-URBAN-X2'], 'min_quantity' => $min,
                     'max_quantity' => $max, 'unit_price_cents' => $price, 'created_at' => $now, 'updated_at' => $now,
                 ]);
@@ -131,7 +129,7 @@ class MicaEbikeDemoSeeder extends Seeder
                     app(InventoryLotService::class)->receive([
                         'inventory_object_id' => $productIds[$code], 'warehouse_id' => $warehouseId,
                         'supplier_id' => $supplierId, 'ownership' => $ownership, 'quantity_received' => $quantity,
-                        'settlement_cost_cents' => $cost, 'received_date' => now()->toDateString(), 'notes' => $note,
+                        'settlement_cost_cents' => $cost, 'received_date' => Carbon::parse(config('demo.date'))->subMonthsNoOverflow(2)->startOfMonth()->toDateString(), 'notes' => $note,
                     ], $actorId);
                 }
             }
