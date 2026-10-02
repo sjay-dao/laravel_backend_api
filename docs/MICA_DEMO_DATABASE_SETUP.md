@@ -184,9 +184,9 @@ The Purchasing route file is absent in the existing project; this milestone repa
 schema dependency but does not claim the procurement UI/API is demonstrated. Optional legacy
 address/email model namespace and employee employment-status field mismatches remain outside
 the intended POS path. Unknown legacy Unit types need explicit classification before use.
-An already-CLOSED completion replay still returns the existing server error, but creates no
-second deduction; the existing POS reconciles order state. These are disclosed rather than
-changing business rules to hide them.
+The deployment-readiness checkpoint now returns a controlled HTTP 409 on CLOSED completion
+replay, without a second deduction or duplicated records; the existing POS reconciles order
+state. See [Render/Vercel deployment preparation](MICA_RENDER_VERCEL_DEPLOYMENT.md).
 
 The intended Mica demo has **no dependency on current development rows**. Frontend code is
 unchanged. Current development schema dumps and unrelated local migration edits are untouched.

@@ -137,8 +137,15 @@ class MicaDemoDatabaseReadinessTest extends TestCase
         $request = ['warehouse_id' => DB::table('warehouses')->value('id'), 'allocations' => $allocations];
         $this->postJson("/api/sales/sales-orders/$id/complete", $request)->assertOk()->assertJsonPath('data.status.code', 'CLOSED');
         $this->assertEquals($before - $quantity, DB::table('inventory_lots')->sum('quantity_available'));
-        $replay = $this->postJson("/api/sales/sales-orders/$id/complete", $request);
-        $this->assertFalse($replay->isSuccessful());
+        $paymentCount = DB::table('sales_order_payments')->count();
+        $movementCount = DB::table('inventory_movements')->count();
+        $itemCount = DB::table('inventory_movement_items')->count();
+        $allocationCount = DB::table('sales_order_lot_allocations')->count();
+        $this->postJson("/api/sales/sales-orders/$id/complete", $request)->assertStatus(409)->assertJsonPath('code', 'SALE_ALREADY_COMPLETED')->assertJsonPath('sales_order_id', $id);
+        $this->assertSame($paymentCount, DB::table('sales_order_payments')->count());
+        $this->assertSame($movementCount, DB::table('inventory_movements')->count());
+        $this->assertSame($itemCount, DB::table('inventory_movement_items')->count());
+        $this->assertSame($allocationCount, DB::table('sales_order_lot_allocations')->count());
         $this->assertEquals($before - $quantity, DB::table('inventory_lots')->sum('quantity_available'));
         DB::table('inventory_objects')->where('id', $product->id)->update(['retail_price_cents' => 9999900]);
         $this->getJson("/api/sales/sales-orders/$id")->assertOk()->assertJsonPath('data.items.0.list_unit_price_cents', $price)->assertJsonPath('data.payment_summary.status', 'PAID');

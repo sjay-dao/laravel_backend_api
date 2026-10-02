@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Str;
-use Pdo\Mysql;
 
 return [
 
@@ -44,7 +43,7 @@ return [
             'transaction_mode' => 'DEFERRED',
         ],
 
-         'ems_system_access' => [
+        'ems_system_access' => [
             'driver' => 'mysql',
             'host' => env('EMS_DB_HOST', '127.0.0.1'),
             'port' => env('EMS_DB_PORT', '3306'),
@@ -69,7 +68,7 @@ return [
             'prefix' => '',
             'strict' => false,
         ],
-        
+
         'ers' => [
             'driver' => 'mysql',
             'host' => env('ERS_DB_HOST', ''),
@@ -98,7 +97,7 @@ return [
             'engine' => null,
         ],
 
-         'rms_database' => [
+        'rms_database' => [
             'driver' => 'mysql',
             'host' => env('RMS_DB_HOST', ''),
             'port' => env('RMS_DB_PORT', ''),
@@ -128,7 +127,8 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => env('MYSQL_ATTR_SSL_VERIFY_SERVER_CERT', true),
             ]) : [],
         ],
 
@@ -148,7 +148,8 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => env('MYSQL_ATTR_SSL_VERIFY_SERVER_CERT', true),
             ]) : [],
         ],
 

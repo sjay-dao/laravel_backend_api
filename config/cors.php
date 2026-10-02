@@ -5,7 +5,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [
+    'allowed_origins' => env('CORS_ALLOWED_ORIGINS') ? array_values(array_filter(array_map('trim', explode(',', env('CORS_ALLOWED_ORIGINS'))))) : [
         'http://localhost:5173',
         'http://localhost:5073',
         'http://127.0.0.1:5173',

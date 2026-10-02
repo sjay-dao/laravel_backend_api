@@ -13,6 +13,13 @@ class DemoDatabaseGuard
         if (config('demo.enabled') !== true || ! app()->environment('local', 'testing', 'demo')) {
             throw new RuntimeException('Demo operations require DEMO_MODE=true and APP_ENV=local, testing or demo. Production is refused.');
         }
+        $this->assertDedicatedConnection();
+    }
+
+    // Public production-style runtime may use ONLY its dedicated database.
+    // This does not grant permission to reset or seed in production.
+    public function assertDedicatedConnection(): void
+    {
         $connection = DB::connection();
         $database = $connection->getDatabaseName();
         if ($connection->getDriverName() === 'sqlite' && $database === ':memory:' && app()->environment('testing')) {
