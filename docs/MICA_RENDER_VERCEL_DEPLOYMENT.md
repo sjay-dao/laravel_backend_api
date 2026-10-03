@@ -52,6 +52,20 @@ It never runs migrations, seeds, reset, a queue worker or scheduler. Apache list
 dotfiles. .env, vendor, caches, local uploads/logs and SQL dumps are excluded from build context.
 The TLS certificate file is supplied by the host, never copied from development.
 
+Apache's PHP workers run as `www-data`. The Dockerfile adds this user to supplementary
+GID 1000, reusing the group if it already exists, so it can read Render runtime secret
+files such as `/etc/secrets/aiven-ca.pem`. The primary group and TLS verification remain
+unchanged. Render also places secret files in the root build context: `.dockerignore`
+excludes `aiven-ca.pem`, certificate/key files, secret directories and common credential
+files. Add an explicit exclusion before configuring any secret filename that these
+patterns do not cover; never copy secret files into the image.
+[Render runtime secret permissions](https://render.com/docs/docker-secrets#accessing-secret-files-at-runtime).
+
+After rebuilding this image, retest `/up`, login for all three demo accounts, authenticated
+roles/permissions, and a read-only inventory request. This permission fix needs no database
+initialization, migrations or seeding. A successful `/up` alone does not prove CA readability
+or database connectivity.
+
 Runtime is PHP 8.3 Apache on Debian Bookworm. Composer requires PHP ^8.3; the Docker image
 installs pdo_mysql, mbstring, bcmath, intl, gd, zip, opcache and gmp. Standard PHP core/XML,
 DOM, ctype, curl, fileinfo, filter, hash, JSON, OpenSSL, session and tokenizer are needed by

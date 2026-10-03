@@ -3,6 +3,21 @@
 .env.*
 !.env.example
 !.env.demo.example
+# Render also adds secret files to the root of the Docker build context.
+aiven-ca.pem
+**/*.pem
+**/*.crt
+**/*.key
+**/*.p12
+**/*.pfx
+secrets
+**/secrets
+.secrets
+**/.secrets
+auth.json
+**/auth.json
+credentials.json
+**/credentials.json
 vendor
 node_modules
 database/*.sql

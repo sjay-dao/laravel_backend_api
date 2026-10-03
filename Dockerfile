@@ -8,6 +8,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && ln -s /usr/local/bin/php /usr/local/bin/php8 \
     && rm -rf /var/lib/apt/lists/*
 
+# Render runtime secret files are readable by members of GID 1000.
+RUN set -eux; \
+    if ! getent group 1000 >/dev/null; then groupadd --gid 1000 render-secrets; fi; \
+    usermod --append --groups 1000 www-data
+
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 WORKDIR /var/www/html
 COPY . .
