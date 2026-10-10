@@ -17,6 +17,10 @@ class InventoryObjectResource extends JsonResource
 
             'name' => $this->name,
 
+            'inventory_category_id' => $this->inventory_category_id,
+
+            'unit_id' => $this->unit_id,
+
             'brand' => $this->brand,
 
             'variant' => $this->variant,

@@ -17,9 +17,14 @@ class UpdateInventoryObjectRequest extends FormRequest
         return [
             'code' => [
                 'nullable',
+                'string',
+                'max:50',
                 Rule::unique('inventory_objects', 'code')
                     ->ignore($this->route('inventory_object')),
             ],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'inventory_category_id' => ['sometimes', 'nullable', 'exists:inventory_categories,id'],
+            'unit_id' => ['sometimes', 'required', 'exists:units,id'],
             'brand' => [
                 'sometimes',
                 'nullable',

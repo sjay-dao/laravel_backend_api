@@ -38,9 +38,10 @@ class InventoryObjectController extends BaseApiController
     public function index(Request $request)
     {
         $this->authorizeAbility($request, 'inventory.products.view');
+        $perPage = min(max((int) $request->integer('per_page', 15), 1), 100);
 
         return $this->paginated(
-            $this->service->paginate(),
+            $this->service->paginate($perPage),
             InventoryObjectResource::class,
             'Inventory objects retrieved successfully.'
         );
@@ -72,6 +73,7 @@ class InventoryObjectController extends BaseApiController
                     'category',
                     'baseUnit',
                     'units.unit',
+                    'wholesalePriceTiers',
                 ])
             )
         );
