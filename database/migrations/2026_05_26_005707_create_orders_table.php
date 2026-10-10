@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('orders', function (Blueprint $table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
 
@@ -20,19 +20,15 @@ return new class extends Migration
             $table->date('order_date');
             $table->date('expected_delivery_date')->nullable();
             $table->date('delivered_at')->nullable();
-            
+
             $table->foreignId('delivery_address_id')
-                ->nullable()
-                ->constrained('addresses')
-                ->nullOnDelete();
+                ->nullable();
             $table->foreignId('assigned_rider_id')
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
             $table->foreignId('branch_id')
-                ->nullable()
-                ->constrained('branches')
-                ->nullOnDelete();
+                ->nullable();
 
             $table->enum('status', ['pending', 'received', 'cancelled'])->default('pending');
 

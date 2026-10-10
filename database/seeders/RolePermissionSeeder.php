@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Domains\System\Models\Permission;
-use App\Domains\System\Models\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -11,20 +9,10 @@ class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('role_permissions')->truncate();
-
-        $admin = Role::where('code', 'admin')->first();
-
+        $admin = DB::table('roles')->where('code', 'admin')->value('id');
         if ($admin) {
-
-            foreach (Permission::pluck('id') as $permissionId) {
-
-                DB::table('role_permissions')->insert([
-                    'role_id' => $admin->id,
-                    'permission_id' => $permissionId,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+            foreach (DB::table('permissions')->pluck('id') as $permissionId) {
+                DB::table('role_permissions')->updateOrInsert(['role_id' => $admin, 'permission_id' => $permissionId], ['created_at' => now(), 'updated_at' => now()]);
             }
         }
     }

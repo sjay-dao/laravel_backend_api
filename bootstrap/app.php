@@ -1,9 +1,12 @@
 <?php
 
+use App\Domains\Sales\Exceptions\SaleAlreadyCompleted;
+use App\Http\Middleware\ProtectDemoEnvironment;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\HandleCors;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,8 +16,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prepend(ProtectDemoEnvironment::class);
         $middleware->append(HandleCors::class);
+        $middleware->trustProxies(headers: Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (SaleAlreadyCompleted $exception, Request $request) {
+            return response()->json(['message' => $exception->getMessage(), 'code' => 'SALE_ALREADY_COMPLETED', 'sales_order_id' => $exception->salesOrderId], 409);
+        });
     })->create();

@@ -47,7 +47,7 @@ return new class extends Migration
                 $table->decimal('quantity', 18, 6);
                 $table->unsignedBigInteger('settlement_cost_cents');
                 $table->timestamps();
-                $table->unique(['sales_order_item_id', 'inventory_lot_id']);
+                $table->unique(['sales_order_item_id', 'inventory_lot_id'], 'so_item_lot_unique');
             });
         }
     }

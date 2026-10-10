@@ -17,6 +17,7 @@ class MicaEbikeDemoInventoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        config(['demo.enabled' => true]);
         $this->createTables();
         (require database_path('migrations/2026_09_30_000000_add_inventory_ownership_lot_foundation.php'))->up();
         DB::table('inventory_movement_types')->insert(['code' => 'LOT_RECEIPT', 'name' => 'Lot receipt', 'direction' => 'IN', 'created_at' => now(), 'updated_at' => now()]);

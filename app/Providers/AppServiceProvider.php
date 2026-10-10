@@ -7,6 +7,7 @@ use App\Domains\Purchasing\Services\NullPurchasingAccountingBoundary;
 use App\Domains\System\Models\User;
 use App\Domains\System\Services\AuthorizationService;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $proxies = config('app.trusted_proxies', '');
+        TrustProxies::at($proxies === '*' ? '*' : array_values(array_filter(explode(',', (string) $proxies))));
 
         Gate::before(function (User $user, string $ability) {
             if (str_contains($ability, '.')) {
@@ -33,8 +36,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         ResetPassword::createUrlUsing(function ($user, string $token) {
-            return env('FRONTEND_URL')
-                . "/reset-password?token={$token}&email={$user->email}";
+            return config('app.frontend_url')
+                ."/reset-password?token={$token}&email={$user->email}";
         });
     }
 }

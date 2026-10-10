@@ -3,6 +3,7 @@
 namespace App\Domains\Sales\Services;
 
 use App\Domains\Inventory\Models\InventoryMovement;
+use App\Domains\Sales\Exceptions\SaleAlreadyCompleted;
 use App\Domains\Sales\Models\SalesOrder;
 use App\Domains\Sales\Models\SalesOrderItem;
 use App\Domains\Sales\Models\SalesOrderPayment;
@@ -115,6 +116,9 @@ class SalesOrderService
         return DB::transaction(function () use ($salesOrder, $data, $actorId) {
             $order = SalesOrder::query()->whereKey($salesOrder->id)->lockForUpdate()->firstOrFail();
             $statusCode = (string) DB::table('lookups')->where('id', $order->status_id)->value('code');
+            if ($statusCode === 'CLOSED') {
+                throw new SaleAlreadyCompleted((int) $order->id);
+            }
             if ($statusCode !== 'CONFIRMED') {
                 throw new InvalidArgumentException('Only confirmed sales orders can be completed.');
             }

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('max_quantity', 18, 6)->nullable();
             $table->unsignedBigInteger('unit_price_cents');
             $table->timestamps();
-            $table->index(['inventory_object_id', 'min_quantity']);
+            $table->index(['inventory_object_id', 'min_quantity'], 'idx_wholesale_object_qty');
         });
         Schema::table('sales_orders', function (Blueprint $table) {
             if (! Schema::hasColumn('sales_orders', 'sale_type')) {

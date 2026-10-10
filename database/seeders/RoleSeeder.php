@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -8,7 +9,7 @@ class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('roles')->insert([
+        $roles = [
             [
                 'code' => 'admin',
                 'name' => 'Administrator',
@@ -39,7 +40,9 @@ class RoleSeeder extends Seeder
                 'name' => 'Manager',
                 'description' => 'Oversees branch operations',
             ],
-        ]);
+        ];
+        foreach ($roles as $role) {
+            DB::table('roles')->updateOrInsert(['code' => $role['code']], $role);
+        }
     }
-
 }
