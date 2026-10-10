@@ -15,7 +15,12 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-
+            $table->foreignId('unit_id')
+                            ->nullable()
+                            ->after('name')
+                            ->constrained('units')
+                            ->nullOnDelete();
+                            
             $table->string('name');
 
             $table->string('sku')->nullable()->unique();

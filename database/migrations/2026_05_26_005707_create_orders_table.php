@@ -29,6 +29,10 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
+            $table->foreignId('branch_id')
+                ->nullable()
+                ->constrained('branches')
+                ->nullOnDelete();
 
             $table->enum('status', ['pending', 'received', 'cancelled'])->default('pending');
 

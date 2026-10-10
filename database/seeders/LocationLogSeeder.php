@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\LocationLog;
-use App\Models\Order;
-use App\Models\User;
+use App\Domains\System\Models\LocationLog;
+use App\Domains\System\Models\Order;
+use App\Domains\System\Models\User;
 use Illuminate\Database\Seeder;
 
 class LocationLogSeeder extends Seeder

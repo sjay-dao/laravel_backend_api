@@ -1,0 +1,97 @@
+<?php
+
+namespace App\Domains\Inventory\Services;
+
+use App\Domains\Inventory\Models\InventoryObject;
+use App\Domains\Inventory\Repositories\InventoryObjectRepository;
+use App\Domains\Inventory\Repositories\InventoryObjectUnitRepository;
+use App\Domains\Shared\Services\BaseCrudService;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+
+class InventoryObjectService extends BaseCrudService
+{
+    protected InventoryObjectUnitRepository $inventoryObjectUnitRepository;
+
+    protected InventoryObjectRepository $inventoryObjectRepository;
+
+    public function __construct(
+        InventoryObjectRepository $repository,
+        InventoryObjectRepository $inventoryObjectRepository,
+        InventoryObjectUnitRepository $inventoryObjectUnitRepository
+    ) {
+        $this->repository = $repository;
+        $this->inventoryObjectRepository = $inventoryObjectRepository;
+        $this->inventoryObjectUnitRepository = $inventoryObjectUnitRepository;
+    }
+
+    public function create(array $data): InventoryObject
+    {
+        return DB::transaction(function () use ($data) {
+            $tiers = $data['wholesale_price_tiers'] ?? null;
+            unset($data['wholesale_price_tiers']);
+
+            $inventoryObject = $this->repository->create($data);
+
+            $this->inventoryObjectUnitRepository->firstOrCreate(
+                [
+                    'inventory_object_id' => $inventoryObject->id,
+                    'unit_id' => $inventoryObject->unit_id,
+                ],
+                [
+                    'conversion_factor' => 1,
+                ]
+            );
+
+            if ($tiers !== null) {
+                app(InventoryPriceTierService::class)->replace($inventoryObject, $tiers);
+            }
+
+            return $this->repository->findById($inventoryObject->id);
+        });
+    }
+
+    public function update(Model $model, array $data): InventoryObject
+    {
+        /** @var InventoryObject $inventoryObject */
+        $inventoryObject = $model;
+
+        return DB::transaction(function () use ($inventoryObject, $data) {
+            $tiers = $data['wholesale_price_tiers'] ?? null;
+            unset($data['wholesale_price_tiers']);
+
+            $oldUnitId = $inventoryObject->unit_id;
+
+            $updated = $this->repository->update(
+                $inventoryObject,
+                $data
+            );
+
+            if (
+                isset($data['unit_id']) &&
+                $oldUnitId !== $data['unit_id']
+            ) {
+                $this->inventoryObjectUnitRepository->firstOrCreate(
+                    [
+                        'inventory_object_id' => $updated->id,
+                        'unit_id' => $data['unit_id'],
+                    ],
+                    [
+                        'conversion_factor' => 1,
+                    ]
+                );
+            }
+
+            if ($tiers !== null) {
+                app(InventoryPriceTierService::class)->replace($updated, $tiers);
+            }
+
+            return $this->repository->findById($updated->id);
+        });
+    }
+
+    public function options()
+    {
+        return $this->inventoryObjectRepository->options();
+    }
+}

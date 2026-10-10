@@ -169,11 +169,59 @@ class OrderController extends Controller
         $orders = Order::with([
             'deliveryAddress',
             'latestLocationLog',
-            'locationLogs'
+            'locationLogs',
+            'branch:id,name'
         ])->get();
 
         return response()->json([
             'orders' => $orders
+        ]);
+    }
+
+    public function assignBranch(Request $request, Order $order)
+    {
+        // dd($request->all());
+        $validated = $request->validate([
+            'branch_id' => [
+                'required',
+                'exists:branches,id',
+            ],
+        ]);
+
+        if ($order->branch_id == $validated['branch_id']) {
+            return response()->json([
+                'message' => 'Order is already assigned to this branch.',
+                'order' => $order->load('branch'),
+            ], 200);
+        }
+
+        $order->update([
+            'branch_id' => $validated['branch_id'],
+        ]);
+        
+        $order->branch_id = $validated['branch_id'];
+
+        // dd(
+        //     $order->branch_id,
+        //     $order->isDirty(),
+        //     $order->save()
+        // );
+
+        return response()->json([
+            'message' => 'Branch assigned successfully.',
+            'order' => $order->fresh('branch'),
+        ]);
+    }
+
+    public function unassignBranch(Order $order)
+    {
+        $order->update([
+            'branch_id' => null,
+        ]);
+
+        return response()->json([
+            'message' => 'Branch unassigned successfully.',
+            'order' => $order,
         ]);
     }
 }
